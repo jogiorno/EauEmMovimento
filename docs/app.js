@@ -25,6 +25,10 @@ L.circleMarker([UFF.lat, UFF.lng], { radius: 9, color: '#fff', weight: 2, fillCo
 $('#toggle').onclick = () => $('#panel').classList.toggle('collapsed');
 const msg = t => $('#msg').textContent = t || '';
 const f = $('#form');
+// Mostra, abaixo de cada campo em minutos, o equivalente em horas.
+const hh = m => { const h = Math.floor(m / 60), r = Math.round(m % 60); return h ? `${h} h${r ? ' ' + r + ' min' : ''}` : `${r} min`; };
+f.querySelectorAll('input[data-min]').forEach(i => { const s = document.createElement('small'); s.style.cssText = 'color:var(--acc);display:block;min-height:20px';
+  i.after(s); i.oninput = () => s.textContent = i.value !== '' && +i.value >= 0 ? '= ' + hh(+i.value) : ''; });
 for (let i = 1; i <= 10; i++) f.semester.add(new Option(i + 'º período', i));
 
 DB.list().then(es => {
@@ -87,18 +91,18 @@ const round = p => p.map(v => +v.toFixed(4));
 f.onsubmit = async ev => {
   ev.preventDefault();
   const num = n => +f[n].value;
-  if (num('classMaxDay') > num('classWeek')) { msg('O dia mais cheio de aula não pode ter mais horas que a semana inteira.'); return; }
+  if (num('classMaxDayMin') > num('classWeekMin')) { msg('O dia mais cheio de aula não pode ter mais tempo que a semana inteira.'); return; }
   $('#send').disabled = true; msg('Enviando…');
   try {
     const H = round(home), U = [UFF.lat, UFF.lng];
-    const body = { home: H, semester: num('semester'), commuteH: num('commuteH'), classWeek: num('classWeek'),
-      classMaxDay: num('classMaxDay'), workH: num('workH'), distKm: +Math.max(0.01, Model.straightKm(H, U)).toFixed(2) };
+    const body = { home: H, semester: num('semester'), distKm: +Math.max(0.01, Model.straightKm(H, U)).toFixed(2) };
+    for (const k of Model.FIELDS) body[k] = num(k);
     await DB.add(body);
     L.polyline([H, U], { color: redShade(Math.random()), weight: 4, opacity: 1, interactive: false }).addTo(tangle);
     $('#n').textContent = +$('#n').textContent + 1;
     const w = Model.week(body, Model.DEFAULTS);
     msg(`Enviado! ${body.distKm.toFixed(1)} km em linha reta. Na semana média sobram ~${w.sleepAvail.toFixed(1)} h de sono por noite; no dia mais pesado, ~${w.sleepWorst.toFixed(1)} h. Veja o dashboard.`);
-    f.reset(); clear(); refresh();
+    f.reset(); f.querySelectorAll('small').forEach(x => x.textContent = ''); clear(); refresh();
   } catch (e) { msg('Erro: ' + e.message); }
   $('#send').disabled = false;
 };

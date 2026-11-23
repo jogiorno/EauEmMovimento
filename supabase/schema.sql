@@ -2,17 +2,18 @@
 create table if not exists public.entries (
   id           uuid primary key default gen_random_uuid(),
   created_at   timestamptz not null default now(),
-  home            jsonb not null,                          -- [lat, lng] da moradia
-  semester        int  not null check (semester between 1 and 10),
-  intern_hours    int  not null check (intern_hours between 0 and 80), -- h/semana de trabalho/estágio
-  dist_km         numeric not null check (dist_km > 0 and dist_km < 200), -- linha reta até a EAU
-  commute_h       numeric check (commute_h between 0.25 and 10),      -- h de deslocamento por dia (ida + volta)
-  class_h_week    numeric check (class_h_week between 0 and 60),      -- h de aula por semana
-  class_h_max_day numeric check (class_h_max_day between 0 and 16 and class_h_max_day <= class_h_week),
-  mode            text,   -- legado
-  real_min        int,    -- legado
-  work            jsonb,  -- legado
-  legs            jsonb,  -- legado
+  home               jsonb not null,                                    -- [lat, lng] da moradia
+  semester           int  not null check (semester between 1 and 10),
+  dist_km            numeric not null check (dist_km > 0 and dist_km < 200), -- linha reta até a EAU
+  -- tudo informado pelo estudante, em minutos
+  commute_min        int check (commute_min between 1 and 600),        -- por dia na EAU, ida + volta
+  class_min_week     int check (class_min_week between 0 and 3600),    -- aulas por semana
+  class_min_max_day  int check (class_min_max_day between 0 and 960 and class_min_max_day <= class_min_week), -- dia mais cheio
+  work_min           int check (work_min between 0 and 4800),          -- trabalho/estágio por semana
+  domestic_min       int check (domestic_min between 0 and 4800),      -- trabalho doméstico por semana
+  reading_min        int check (reading_min between 0 and 4800),       -- leitura por semana
+  study_min          int check (study_min between 0 and 4800),         -- estudos extraclasse e trabalhos por semana
+  selfcare_min       int check (selfcare_min between 0 and 4800),      -- autocuidado por semana
   check (jsonb_typeof(home) = 'array' and jsonb_array_length(home) = 2)
 );
 

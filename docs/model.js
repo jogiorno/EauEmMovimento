@@ -5,9 +5,8 @@ window.Model = (() => {
 
   const DEFAULTS = {
     sleepPerDay: 7,        // h de sono por dia
-    essentialsPerDay: 3.5, // alimentação, higiene, tarefas domésticas
-    studyExtra: 10,        // h/semana de trabalho extraclasse (ateliê, projetos)
-    campusDays: 5,         // dias por semana na universidade
+    essentialsPerDay: 2.5, // alimentação e higiene (tarefas domésticas, estudo, leitura e autocuidado vêm do estudante)
+    campusDays: 5,         // dias por semana na EAU
     freeMin: 10,           // h/semana de lazer/vida social que se quer preservar
   };
 
@@ -18,19 +17,22 @@ window.Model = (() => {
     return 12742 * Math.asin(Math.sqrt(h));
   }
 
-    const complete = e => e.commuteH != null && e.classWeek != null && e.classMaxDay != null;
+    // Tudo é informado pelo estudante em MINUTOS (commuteMin: por dia na EAU, ida + volta; classMaxDayMin: dia mais cheio de
+  // aula; o resto: por semana). O modelo e o site trabalham em horas.
+  const FIELDS = ['commuteMin', 'classWeekMin', 'classMaxDayMin', 'workMin', 'domesticMin', 'readingMin', 'studyMin', 'selfcareMin'];
+  const complete = e => FIELDS.every(k => e[k] != null);
+  const H = m => m / 60;
 
-  // e.commuteH = horas de deslocamento por dia na UFF (ida + volta, transporte + caminhada);
-  // e.classWeek = h de aula por semana; e.classMaxDay = h de aula no dia mais cheio; e.workH = h/semana de trabalho/estágio.
   function week(e, a) {
-    const commute = e.commuteH * a.campusDays;
+    const commute = H(e.commuteMin) * a.campusDays, cls = H(e.classWeekMin), work = H(e.workMin), dom = H(e.domesticMin),
+      read = H(e.readingMin), study = H(e.studyMin), self = H(e.selfcareMin);
     const sleep = a.sleepPerDay * 7, ess = a.essentialsPerDay * 7;
-    const used = commute + e.classWeek + e.workH + sleep + ess + a.studyExtra;
-    const sleepAvail = (168 - commute - e.classWeek - e.workH - ess - a.studyExtra - a.freeMin) / 7; // h/noite, semana média
-    // Dia mais pesado: o maior dia de aula + deslocamento + parcela diária de trabalho/estudo.
-    const sleepWorst = 24 - e.commuteH - e.classMaxDay - e.workH / a.campusDays - a.essentialsPerDay - a.studyExtra / a.campusDays;
-    return { sleepAvail, sleepWorst, commute, class: e.classWeek, intern: e.workH, sleep, essentials: ess, study: a.studyExtra, free: 168 - used };
+    const used = commute + cls + work + dom + read + study + self + sleep + ess;
+    const sleepAvail = (168 - used + sleep - a.freeMin) / 7; // h/noite, semana média
+    // Dia mais pesado: maior dia de aula + deslocamento + parcela diária das demais atividades.
+    const sleepWorst = 24 - H(e.commuteMin) - H(e.classMaxDayMin) - (work + study) / a.campusDays - (dom + read + self) / 7 - a.essentialsPerDay;
+    return { sleepAvail, sleepWorst, commute, class: cls, intern: work, domestic: dom, reading: read, study, selfcare: self, sleep, essentials: ess, free: 168 - used };
   }
 
-  return { UFF, DEFAULTS, straightKm, complete, week };
+  return { UFF, DEFAULTS, FIELDS, straightKm, complete, week };
 })();

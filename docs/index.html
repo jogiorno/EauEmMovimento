@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Desloca EAU – Emaranhado</title>
+<title>EAU em Movimento – Emaranhado</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
@@ -31,7 +31,7 @@ html,body{height:100%}body{display:flex;flex-direction:column;height:100vh;heigh
 .leaflet-overlay-pane canvas{mix-blend-mode:screen}
 .dark-tiles{filter:invert(1) hue-rotate(180deg) brightness(.95) contrast(.75) saturate(.25)}
 </style></head><body class="map">
-<nav><img src="logo.png" alt=""><b>DESLOCA EAU</b><a class="on" href="index.html">Mapa</a><a href="dashboard.html">Dashboard</a><span class="sp"></span><small>Arquitetura e Urbanismo · UFF Praia Vermelha</small></nav>
+<nav><img src="logo.png" alt=""><b>EAU EM MOVIMENTO</b><a class="on" href="index.html">Mapa</a><a href="dashboard.html">Dashboard</a><span class="sp"></span><small>Arquitetura e Urbanismo · UFF Praia Vermelha</small></nav>
 <div id="wrap"><div id="map"></div>
 <div id="panel">
   <div class="hd"><h2>Desenhe o seu trajeto</h2><button id="toggle" type="button" aria-label="Recolher ou expandir painel">▾</button></div>
@@ -42,14 +42,22 @@ html,body{height:100%}body{display:flex;flex-direction:column;height:100vh;heigh
   <form id="form" hidden>
     <label>Período do curso</label>
     <select name="semester"></select>
-    <label>Tempo de deslocamento por dia na UFF, ida + volta, transporte + caminhada (h)</label>
-    <input name="commuteH" type="number" min="0.25" max="10" step="0.25" required placeholder="ex.: 2">
-    <label>Horas de aula por semana neste semestre (h)</label>
-    <input name="classWeek" type="number" min="1" max="60" step="0.5" required placeholder="ex.: 28">
-    <label>Máximo de horas em aula em um único dia neste semestre (h)</label>
-    <input name="classMaxDay" type="number" min="1" max="16" step="0.5" required placeholder="ex.: 8">
-    <label>Horas de trabalho/estágio por semana (0 se não trabalha)</label>
-    <input name="workH" type="number" min="0" max="80" step="1" required value="0">
+    <label>Tempo de deslocamento por dia na EAU, ida + volta, transporte + caminhada (min)</label>
+    <input name="commuteMin" data-min type="number" min="1" max="600" step="1" required placeholder="ex.: 120">
+    <label>Tempo de aula por semana neste semestre (min)</label>
+    <input name="classWeekMin" data-min type="number" min="1" max="3600" step="15" required placeholder="ex.: 1680 (28 h)">
+    <label>Máximo de tempo em aula em um único dia neste semestre (min)</label>
+    <input name="classMaxDayMin" data-min type="number" min="1" max="960" step="15" required placeholder="ex.: 480 (8 h)">
+    <label>Trabalho/estágio por semana (min; 0 se não trabalha)</label>
+    <input name="workMin" data-min type="number" min="0" max="4800" step="15" required placeholder="ex.: 1200 (20 h)">
+    <label>Trabalho doméstico por semana: cuidado com familiares, mercado, limpeza da casa etc. (min)</label>
+    <input name="domesticMin" data-min type="number" min="0" max="4800" step="15" required placeholder="ex.: 420 (7 h)">
+    <label>Leitura por semana (min)</label>
+    <input name="readingMin" data-min type="number" min="0" max="4800" step="15" required placeholder="ex.: 180 (3 h)">
+    <label>Estudos extraclasse e trabalhos por semana: ateliê, projetos, entregas (min)</label>
+    <input name="studyMin" data-min type="number" min="0" max="4800" step="15" required placeholder="ex.: 900 (15 h)">
+    <label>Autocuidado por semana: terapia, exercício físico, consultas, exames etc. (min)</label>
+    <input name="selfcareMin" data-min type="number" min="0" max="4800" step="15" required placeholder="ex.: 240 (4 h)">
     <p>Por privacidade, as coordenadas são arredondadas (~10 m) e nenhum nome é guardado. Use um ponto próximo, não necessariamente a porta de casa.</p>
     <button class="pri" style="width:100%;margin-top:18px" id="send">Enviar trajeto</button>
   </form>
