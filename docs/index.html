@@ -35,20 +35,21 @@ html,body{height:100%}body{display:flex;flex-direction:column;height:100vh;heigh
 <div id="wrap"><div id="map"></div>
 <div id="panel">
   <div class="hd"><h2>Desenhe o seu trajeto</h2><button id="toggle" type="button" aria-label="Recolher ou expandir painel">▾</button></div>
-  <p>Cada linha é o caminho de um estudante até a UFF. Juntas, formam o emaranhado.</p>
+  <p>Cada linha reta liga a moradia de um estudante à Escola de Arquitetura e Urbanismo. Juntas, formam o emaranhado.</p>
   <div class="step"><span class="dot" style="background:#5fd4e6"></span><span id="s1">1. Clique no mapa: <b>moradia</b></span></div>
-  <div class="step"><span class="dot" style="background:#ffc857"></span><span id="s2">2. Trabalho/estágio (opcional)</span></div>
-  <div class="row"><button id="skipWork" type="button">Não trabalho/estagio</button><button id="reset" type="button">Recomeçar</button></div>
+  <div class="row"><button id="reset" type="button">Recomeçar</button></div>
   <input id="q" placeholder="Buscar endereço ou bairro…" style="width:100%;margin-top:22px"><div id="results"></div>
   <form id="form" hidden>
     <label>Período do curso</label>
     <select name="semester"></select>
-    <label>Como você vai à UFF?</label>
-    <select name="mode"></select>
-    <label>Carga de estágio/trabalho (h/semana)</label>
-    <select name="internHours"><option value="0">Nenhuma</option><option value="20">20 h</option><option value="25">25 h</option><option value="30">30 h</option></select>
-    <label>Tempo real de ida, em minutos (opcional)</label>
-    <input name="realMin" type="number" min="1" max="360" placeholder="deixe vazio para estimar" style="width:100%">
+    <label>Tempo de deslocamento por dia na UFF, ida + volta, transporte + caminhada (h)</label>
+    <input name="commuteH" type="number" min="0.25" max="10" step="0.25" required placeholder="ex.: 2">
+    <label>Horas de aula por semana neste semestre (h)</label>
+    <input name="classWeek" type="number" min="1" max="60" step="0.5" required placeholder="ex.: 28">
+    <label>Máximo de horas em aula em um único dia neste semestre (h)</label>
+    <input name="classMaxDay" type="number" min="1" max="16" step="0.5" required placeholder="ex.: 8">
+    <label>Horas de trabalho/estágio por semana (0 se não trabalha)</label>
+    <input name="workH" type="number" min="0" max="80" step="1" required value="0">
     <p>Por privacidade, as coordenadas são arredondadas (~10 m) e nenhum nome é guardado. Use um ponto próximo, não necessariamente a porta de casa.</p>
     <button class="pri" style="width:100%;margin-top:18px" id="send">Enviar trajeto</button>
   </form>

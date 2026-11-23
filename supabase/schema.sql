@@ -2,19 +2,18 @@
 create table if not exists public.entries (
   id           uuid primary key default gen_random_uuid(),
   created_at   timestamptz not null default now(),
-  home         jsonb not null,
-  work         jsonb,
-  semester     int  not null check (semester between 1 and 10),
-  mode         text not null check (mode in ('pe','bike','onibus','integrado','carro','app')),
-  intern_hours int  not null check (intern_hours in (0,20,25,30)),
-  real_min     int  check (real_min between 1 and 360),
-  dist_km      numeric not null check (dist_km > 0 and dist_km < 200),
-  legs         jsonb not null,
-  check (jsonb_typeof(home) = 'array' and jsonb_array_length(home) = 2),
-  check (work is null or (jsonb_typeof(work) = 'array' and jsonb_array_length(work) = 2)),
-  check (jsonb_typeof(legs) = 'array' and jsonb_array_length(legs) between 1 and 2),
-  check (work is not null or intern_hours = 0),
-  check (pg_column_size(legs) < 200000)
+  home            jsonb not null,                          -- [lat, lng] da moradia
+  semester        int  not null check (semester between 1 and 10),
+  intern_hours    int  not null check (intern_hours between 0 and 80), -- h/semana de trabalho/estágio
+  dist_km         numeric not null check (dist_km > 0 and dist_km < 200), -- linha reta até a EAU
+  commute_h       numeric check (commute_h between 0.25 and 10),      -- h de deslocamento por dia (ida + volta)
+  class_h_week    numeric check (class_h_week between 0 and 60),      -- h de aula por semana
+  class_h_max_day numeric check (class_h_max_day between 0 and 16 and class_h_max_day <= class_h_week),
+  mode            text,   -- legado
+  real_min        int,    -- legado
+  work            jsonb,  -- legado
+  legs            jsonb,  -- legado
+  check (jsonb_typeof(home) = 'array' and jsonb_array_length(home) = 2)
 );
 
 alter table public.entries enable row level security;
