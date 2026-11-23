@@ -35,7 +35,7 @@ function render() {
     [fmt(avg(rows.map(r => r.hrs))) + ' h', 'deslocamento médio por dia (ida + volta)'],
     [fmt(avg(rows.map(r => r.e.distKm))) + ' km', 'distância média em linha reta'],
     [fmt(weekCommute) + ' h', 'deslocamento por semana'],
-    [fmt(weekCommute * 36, 0) + ' h', 'deslocamento por ano letivo (≈36 sem.)'],
+    [fmt(weekCommute * 18, 0) + ' h', 'deslocamento por semestre (≈18 sem.)'],
     [n ? fmt(100 * neg / n, 0) + '%' : '–', 'com semana que não fecha (tempo livre < 0)'],
   ].map(([b, s]) => `<div class="card kpi"><b>${b}</b><span>${s}</span></div>`).join('');
 
