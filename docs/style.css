@@ -21,3 +21,6 @@ label{display:block;font-size:13px;color:var(--mute);margin:18px 0 6px}
 /* campos numéricos sem setinhas: o usuário só digita */
 input[type=number]{-moz-appearance:textfield;appearance:textfield}
 input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+/* campos numéricos sem setinhas: o usuário só digita */
+input[type=number]{-moz-appearance:textfield;appearance:textfield}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}

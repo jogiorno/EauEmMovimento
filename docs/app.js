@@ -1,12 +1,13 @@
 const { UFF } = Model;
 const $ = s => document.querySelector(s);
-const map = L.map('map', { preferCanvas: true }).setView([UFF.lat, UFF.lng], 11);
+const map = L.map('map', { preferCanvas: true, zoomControl: false }).setView([UFF.lat, UFF.lng], 11);
 // Tiles sem chave de API. O OSM é escurecido por filtro CSS (classe .dark-tiles).
 const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
   { attribution: '© OpenStreetMap contributors', maxZoom: 19, className: 'dark-tiles', opacity: 0.7 });
 const esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
   { attribution: 'Tiles © Esri', maxZoom: 16, opacity: 0.7 });
 osm.addTo(map);
+L.control.zoom({ position: 'topright' }).addTo(map);
 L.control.layers({ 'OSM (escuro)': osm, 'Esri cinza escuro': esri }, null, { position: matchMedia('(max-width:720px)').matches ? 'topright' : 'bottomleft' }).addTo(map);
 // se o OSM falhar repetidamente, troca sozinho para Esri
 let tileErrors = 0;
