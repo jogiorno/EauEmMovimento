@@ -31,7 +31,7 @@ html,body{height:100%}body{display:flex;flex-direction:column;height:100vh;heigh
 .leaflet-overlay-pane canvas{mix-blend-mode:screen}
 .dark-tiles{filter:invert(1) hue-rotate(180deg) brightness(.95) contrast(.75) saturate(.25)}
 </style></head><body class="map">
-<nav><img src="logo.png" alt=""><b>EAU EM MOVIMENTO</b><a class="on" href="index.html">Mapa</a><a href="dashboard.html">Dashboard</a><span class="sp"></span><small>Arquitetura e Urbanismo · UFF Praia Vermelha</small></nav>
+<nav><img src="logo.png" alt=""><b>EAU EM MOVIMENTO</b><a class="on" href="index.html">Mapa</a><a href="dashboard.html">Dashboard</a><a href="meu-trajeto.html">Meu trajeto</a><span class="sp"></span><small>Arquitetura e Urbanismo · UFF Praia Vermelha</small></nav>
 <div id="wrap"><div id="map"></div>
 <div id="panel">
   <div class="hd"><h2>Desenhe o seu trajeto</h2><button id="toggle" type="button" aria-label="Recolher ou expandir painel">▾</button></div>
@@ -39,6 +39,7 @@ html,body{height:100%}body{display:flex;flex-direction:column;height:100vh;heigh
   <div class="step"><span class="dot" style="background:#5fd4e6"></span><span id="s1">1. Clique no mapa: <b>moradia</b></span></div>
   <div class="row"><button id="reset" type="button">Recomeçar</button></div>
   <input id="q" placeholder="Buscar endereço ou bairro…" style="width:100%;margin-top:22px"><div id="results"></div>
+  <p id="done" hidden>Você já registrou seu trajeto neste dispositivo. Obrigado! Veja as suas informações em <a href="meu-trajeto.html" style="color:var(--acc)">Meu trajeto</a>.</p>
   <form id="form" hidden>
     <label>Período do curso</label>
     <select name="semester"></select>
@@ -64,6 +65,7 @@ html,body{height:100%}body{display:flex;flex-direction:column;height:100vh;heigh
   <div id="msg"></div>
 </div>
 <div class="stat"><b id="n">0</b> trajetos</div></div>
+<footer class="aviso">Este site não pretende fazer um levantamento definitivo, e sim chamar atenção para a exaustão dos estudantes de arquitetura e urbanismo. Entendemos que os dados aqui coletados podem não ser exatamente um retrato fiel da realidade.</footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script src="config.js"></script><script src="db.js"></script><script src="model.js"></script><script src="app.js"></script>
 </body></html>

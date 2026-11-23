@@ -39,10 +39,20 @@ DB.list().then(es => {
 }).catch(e => msg(e.message));
 
 let home = null, marker = null;
+// Um trajeto por dispositivo: o envio fica guardado no navegador (página "Meu trajeto") e trava novos envios.
+const KEY = 'eau-meu-trajeto';
+let mine = null;
+try { mine = JSON.parse(localStorage.getItem(KEY)); } catch {}
+function lock() {
+  mine = true;
+  for (const q of ['.step', '.row', '#q', '#results', '#form']) document.querySelectorAll('#panel ' + q).forEach(x => x.style.display = 'none');
+  $('#panel h2').textContent = 'Trajeto registrado ✓'; $('#done').hidden = false;
+  document.querySelector('#panel > p:not(#done)').style.display = 'none';
+}
 
 function refresh() {
   $('#s1').innerHTML = home ? '1. Moradia marcada ✓' : '1. Clique no mapa: <b>moradia</b>';
-  f.hidden = !home;
+  f.hidden = !home || !!mine;
 }
 // Valida o clique: o ponto precisa estar perto de uma via (rejeita mar, baías e oceano) e é ajustado à via mais próxima.
 const MAX_FROM_ROAD_M = 100;
@@ -55,7 +65,7 @@ async function snap(ll) {
 let checking = false, preview = null;
 const clear = () => { home = null; marker?.remove(); preview?.remove(); marker = preview = null; };
 async function setPoint(raw) {
-  if (checking || home) return;
+  if (checking || home || mine) return;
   checking = true; msg('Validando ponto…');
   try {
     const { dist, ll } = await snap(raw);
@@ -100,11 +110,13 @@ f.onsubmit = async ev => {
     // só o deslocamento é digitado em minutos; os demais campos são digitados em horas e guardados em minutos
     for (const k of Model.FIELDS) body[k] = k === 'commuteMin' ? num(k) : Math.round(num(k) * 60);
     await DB.add(body);
+    try { localStorage.setItem(KEY, JSON.stringify({ body, at: Date.now() })); } catch {}
     L.polyline([H, U], { color: redShade(Math.random()), weight: 4, opacity: 1, interactive: false }).addTo(tangle);
     $('#n').textContent = +$('#n').textContent + 1;
     const w = Model.week(body, Model.DEFAULTS);
     msg(`Enviado! ${body.distKm.toFixed(1)} km em linha reta. Na semana média sobram ~${w.sleepAvail.toFixed(1)} h de sono por noite; no dia mais pesado, ~${w.sleepWorst.toFixed(1)} h. Veja o dashboard.`);
-    f.reset(); f.querySelectorAll('small').forEach(x => x.textContent = ''); clear(); refresh();
+    f.reset(); f.querySelectorAll('small').forEach(x => x.textContent = ''); clear(); refresh(); lock();
   } catch (e) { msg('Erro: ' + e.message); }
   $('#send').disabled = false;
 };
+if (mine) lock();

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EAU em Movimento – Meu trajeto</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+html,body{min-height:100%}body{display:flex;flex-direction:column;min-height:100vh}
+main{flex:1;width:100%;max-width:1160px;margin:0 auto;padding:56px 40px 72px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:24px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:28px 32px}
+.kpi b{display:block;font-size:32px;line-height:1.2;margin-bottom:8px;color:var(--acc)}.kpi span{color:var(--mute);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(420px,100%),1fr));gap:24px;margin-top:24px}
+h1{margin:0 0 12px;font-size:32px}h3{margin:0 0 20px;font-size:17px}canvas{max-height:340px}
+.lead{color:var(--mute);max-width:64ch;margin:0 0 40px}
+#map{height:300px;border-radius:8px;background:#e8eaed}
+table{width:100%;border-collapse:collapse;font-size:13px}td{padding:6px 0;border-bottom:1px solid var(--line)}td:last-child{text-align:right;color:var(--fg)}
+.empty{max-width:60ch}.empty a{color:var(--acc)}
+@media (max-width:720px){
+  main{padding:24px 16px 40px}h1{font-size:24px}
+  .kpis{grid-template-columns:repeat(2,1fr);gap:12px}.card{padding:18px 16px;border-radius:10px}.kpi b{font-size:24px}.kpi span{font-size:12px}
+  .grid{gap:16px;margin-top:16px}h3{font-size:15px;margin-bottom:14px}
+}
+</style></head><body>
+<nav><img src="logo.png" alt=""><b>EAU EM MOVIMENTO</b><a href="index.html">Mapa</a><a href="dashboard.html">Dashboard</a><a class="on" href="meu-trajeto.html">Meu trajeto</a><span class="sp"></span><small>Arquitetura e Urbanismo · UFF Praia Vermelha</small></nav>
+<main>
+  <h1>Meu trajeto</h1>
+  <div id="empty" class="card empty" hidden>Você ainda não registrou um trajeto neste dispositivo. Vá ao <a href="index.html">mapa</a>, marque a sua moradia e responda às perguntas.</div>
+  <div id="mine" hidden>
+    <p class="lead">Estas são só as informações que você enviou, guardadas neste dispositivo. Elas não aparecem para ninguém separadamente: no mapa e no dashboard, entram junto com as dos demais estudantes.</p>
+    <div class="kpis" id="kpis"></div>
+    <div class="grid">
+      <div class="card"><h3>Sua semana (168 h)</h3><canvas id="c1"></canvas></div>
+      <div class="card"><h3>Sua moradia e a EAU</h3><div id="map"></div></div>
+      <div class="card" style="grid-column:1/-1"><h3>O que você informou</h3><table id="tbl"></table></div>
+    </div>
+  </div>
+</main>
+<footer class="aviso">Este site não pretende fazer um levantamento definitivo, e sim chamar atenção para a exaustão dos estudantes de arquitetura e urbanismo. Entendemos que os dados aqui coletados podem não ser exatamente um retrato fiel da realidade.</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="model.js"></script><script src="meu.js"></script>
+</body></html>

@@ -1,6 +1,6 @@
 -- Segunda migração: tudo passa a ser informado em MINUTOS e entram novas perguntas
 -- (trabalho doméstico, leitura, estudos extraclasse, autocuidado). Rode uma vez: SQL Editor → New query → Run.
--- ATENÇÃO: apaga os trajetos já enviados (não têm os campos novos).
+-- ATENÇÃO: apaga os trajetos já enviados (não têm os campos novos). Pode ser rodada mais de uma vez.
 delete from public.entries;
 
 do $$ declare c text; begin
@@ -16,14 +16,14 @@ alter table public.entries
   drop column if exists intern_hours;
 
 alter table public.entries
-  add column commute_min       int,  -- por dia na EAU, ida + volta
-  add column class_min_week    int,
-  add column class_min_max_day int,  -- dia mais cheio de aula
-  add column work_min          int,  -- trabalho/estágio por semana
-  add column domestic_min      int,
-  add column reading_min       int,
-  add column study_min         int,
-  add column selfcare_min      int;
+  add column if not exists commute_min       int,  -- por dia na EAU, ida + volta
+  add column if not exists class_min_week    int,
+  add column if not exists class_min_max_day int,  -- dia mais cheio de aula
+  add column if not exists work_min          int,  -- trabalho/estágio por semana
+  add column if not exists domestic_min      int,
+  add column if not exists reading_min       int,
+  add column if not exists study_min         int,
+  add column if not exists selfcare_min      int;
 
 alter table public.entries
   add check (jsonb_typeof(home) = 'array' and jsonb_array_length(home) = 2),
@@ -37,3 +37,6 @@ alter table public.entries
   add check (reading_min between 0 and 4800),
   add check (study_min between 0 and 4800),
   add check (selfcare_min between 0 and 4800);
+
+-- faz a API do Supabase reconhecer as colunas novas imediatamente
+notify pgrst, 'reload schema';
