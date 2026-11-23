@@ -97,7 +97,8 @@ f.onsubmit = async ev => {
   try {
     const H = round(home), U = [UFF.lat, UFF.lng];
     const body = { home: H, semester: num('semester'), distKm: +Math.max(0.01, Model.straightKm(H, U)).toFixed(2) };
-    for (const k of Model.FIELDS) body[k] = num(k);
+    // só o deslocamento é digitado em minutos; os demais campos são digitados em horas e guardados em minutos
+    for (const k of Model.FIELDS) body[k] = k === 'commuteMin' ? num(k) : Math.round(num(k) * 60);
     await DB.add(body);
     L.polyline([H, U], { color: redShade(Math.random()), weight: 4, opacity: 1, interactive: false }).addTo(tangle);
     $('#n').textContent = +$('#n').textContent + 1;
