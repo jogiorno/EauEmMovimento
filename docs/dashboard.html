@@ -12,39 +12,93 @@ main{max-width:1160px;margin:0 auto;padding:56px 40px 96px}
 h3{margin:0 0 20px;font-size:17px}canvas{max-height:340px}
 .assump{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px}
 .assump input{width:100%}.terms{display:grid;grid-template-columns:repeat(10,1fr);gap:8px}.terms input{padding:9px 4px;width:100%}
-.hero{display:flex;gap:32px;align-items:center;margin-bottom:48px}.hero h1{margin:0 0 12px;font-size:32px}.hero p{max-width:60ch}.hero p{margin:0;color:var(--mute)}
+.hero{display:flex;gap:32px;align-items:center;margin-bottom:48px}.hero h1{margin:0 0 16px;font-size:clamp(40px,6vw,64px);line-height:1.1}.hero p{max-width:60ch}.hero p{margin:0;color:var(--mute)}
 .big{background:var(--acc);color:#fff;border-radius:14px;padding:40px 48px;margin:0 0 32px}.big:empty{display:none}
 .big b{display:block;font-family:Manrope,system-ui,sans-serif;font-weight:800;font-size:clamp(64px,14vw,160px);line-height:1;letter-spacing:-.02em}
 .big span{display:block;margin-top:16px;font-size:20px;line-height:1.5;max-width:42ch}.big small{display:block;margin-top:12px;font-size:13px;opacity:.85}
 .kpi.alert{background:var(--acc);border-color:var(--acc)}.kpi.alert b,.kpi.alert span{color:#fff}.kpi.alert strong{font-weight:800}
+h2.sec{font-family:Manrope,system-ui,sans-serif;font-size:28px;margin:72px 0 6px;padding-top:14px;border-top:2px solid var(--fg)}.sub{color:var(--mute);margin:0 0 20px;max-width:75ch}
+.feat{padding:32px 36px}canvas.tall{max-height:560px}
+.seg{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.seg button{font-size:13px}.seg button.on{background:var(--fg);border-color:var(--fg);color:#fff}
+.ctl{display:flex;align-items:center;gap:12px;margin-bottom:18px}.ctl label{margin:0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px}
+.stats div{border:1px solid var(--line);border-radius:8px;padding:10px 14px}.stats b{display:block;font-family:Manrope,system-ui,sans-serif;font-size:20px}.stats span{font-size:12px;color:var(--mute)}
+.lg{display:flex;flex-wrap:wrap;gap:6px 14px;margin:12px 0 0;font-size:12px;color:var(--mute)}.lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px}
+.smg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}.sm{padding:16px 18px}.sm h4{margin:0 0 8px;font-family:Manrope,system-ui,sans-serif;font-size:16px}.sm small{font-weight:400;color:var(--mute);font-size:12px}
+.method{font-size:13px;line-height:1.8;color:var(--mute);max-width:90ch}.method h3{color:var(--fg);margin:28px 0 8px;font-size:15px}.method li{margin:4px 0}.method strong{color:var(--fg)}
 .note{color:var(--mute);font-size:13px;line-height:1.8}.warn{border-left:3px solid var(--acc);padding-left:20px;margin:0 0 40px}
 @media (max-width:720px){
   main{padding:24px 16px 56px}
-  .hero{flex-direction:column;align-items:flex-start;gap:16px;margin-bottom:28px}.hero img{height:80px}.hero h1{font-size:24px;margin-bottom:8px}
+  .hero{flex-direction:column;align-items:flex-start;gap:16px;margin-bottom:28px}.hero img{height:80px}.hero h1{font-size:38px;margin-bottom:10px}
   .warn{padding-left:14px;margin-bottom:24px}
   .kpis{grid-template-columns:repeat(2,1fr);gap:12px}.big{padding:24px 20px;border-radius:10px;margin-bottom:24px}.big span{font-size:16px}
   .card{padding:18px 16px;border-radius:10px}.kpi b{font-size:24px}.kpi span{font-size:12px}
-  .grid{gap:16px;margin-top:16px}h3{font-size:15px;margin-bottom:14px}
+  .grid{gap:16px;margin-top:16px}h3{font-size:15px;margin-bottom:14px}h2.sec{font-size:22px;margin-top:44px}.feat{padding:18px 16px}
   .terms{grid-template-columns:repeat(5,1fr)}
 }
 </style></head><body>
 <nav><img src="logo.png" alt=""><b>EAU EM MOVIMENTO</b><a href="index.html">Mapa</a><a class="on" href="dashboard.html">Dados</a><a href="meu-trajeto.html">Meu trajeto</a><span class="sp"></span><small>Arquitetura e Urbanismo · UFF Praia Vermelha</small></nav>
 <main>
-<div class="hero"><img src="logo.png" alt="Passei 40 horas sem dormir" height="120"><div><h1>Quanto sobra para dormir?</h1><p>Somamos aulas, trabalho/estágio, trabalho doméstico, leitura, estudo, autocuidado, atividades essenciais e o tempo de deslocamento informados por cada estudante. O que restar, depois de preservar algum tempo livre, é o sono possível.</p></div></div>
+<div class="hero"><div><h1>Quanto sobra para dormir?</h1><p>Somamos aulas, trabalho/estágio, trabalho doméstico, leitura, estudo, autocuidado, atividades essenciais e o tempo de deslocamento informados por cada estudante. O que restar, depois de preservar algum tempo livre, é o sono possível.</p></div></div>
 <div class="big" id="headline"></div>
 <p class="note warn">Cada estudante informa o que faz no semestre em curso (deslocamento em minutos, o restante em horas): deslocamento, aulas, trabalho/estágio, trabalho doméstico, leitura, estudos extraclasse e autocuidado. Somamos esses valores a premissas editáveis abaixo (sono, alimentação e higiene, dias na EAU, lazer mínimo); o que restar é o sono possível. O "dia mais pesado" usa o maior dia de aula informado, o deslocamento diário e a parcela diária das demais atividades.</p>
 <div class="kpis" id="kpis"></div>
-<div class="grid">
-  <div class="card" style="grid-column:1/-1"><h3>Sono possível por noite, por período (h)</h3><canvas id="c5"></canvas></div>
-  <div class="card"><h3>Semana média por período (168 h)</h3><canvas id="c1"></canvas></div>
-  <div class="card"><h3>Deslocamento por dia, ida + volta (h) – distribuição</h3><canvas id="c2"></canvas></div>
-  <div class="card"><h3>Tempo livre semanal por período (h)</h3><canvas id="c3"></canvas></div>
-  <div class="card"><h3>Trabalho/estágio ao longo do curso (% por período)</h3><canvas id="c6"></canvas></div>
-  <div class="card"><h3>Horas de aula no dia mais cheio</h3><canvas id="c4"></canvas></div>
+
+<h2 class="sec">1. A semana não fecha.</h2>
+<p class="sub">Quantas horas faltam para acomodar as atividades e as premissas de tempo consideradas?</p>
+<div class="card feat">
+  <div class="seg" id="seg1"><button type="button" data-m="mean" class="on">Saldo médio por período</button><button type="button" data-m="dist">Distribuição individual</button><button type="button" data-m="neg">Estudantes com saldo negativo</button></div>
+  <canvas id="g1" class="tall"></canvas>
+  <p class="note" id="n1"></p><p class="note" id="p1"></p>
 </div>
+
+<h2 class="sec">2. Quanto conseguimos dormir?</h2>
+<p class="sub">Distribuição do sono possível estimado entre os estudantes.</p>
+<div class="card feat">
+  <div class="ctl"><label for="f2">Período</label><select id="f2"></select></div>
+  <div class="stats" id="st2"></div>
+  <canvas id="g2" class="tall"></canvas>
+  <p class="note" id="n2"></p><p class="note" id="p2"></p>
+</div>
+
+<h2 class="sec">3. Para onde vão as 168 horas?</h2>
+<p class="sub">Distribuição semanal do tempo entre formação, trabalho, reprodução cotidiana e recuperação.</p>
+<div class="card">
+  <div class="seg" id="seg3"><button type="button" data-m="full" class="on">Declarado + premissas</button><button type="button" data-m="declared">Só o declarado</button></div>
+  <canvas id="g3" class="tall"></canvas>
+  <p class="note" id="n3"></p><p class="note" id="p3"></p>
+</div>
+
+<h2 class="sec">4. A distância também consome tempo.</h2>
+<p class="sub">Como o tempo de deslocamento se relaciona com o sono possível?</p>
+<div class="card"><canvas id="g4"></canvas><div class="lg" id="lg4"></div><p class="note" id="n4"></p><p class="note" id="p4"></p></div>
+
+<h2 class="sec">5. Como a sobrecarga muda ao longo do curso?</h2>
+<p class="sub">Comparação das atividades acadêmicas, profissionais e do sono possível.</p>
+<div class="smg" id="sm"></div>
+<p class="note" id="n5"></p>
+
 <div class="card" style="margin-top:24px"><h3>Premissas (editáveis)</h3>
   <div class="assump" id="assump"></div>
-  <p class="note">Tempo livre negativo = a semana não fecha: o estudante precisa cortar sono, estudo ou lazer.</p>
+  <p class="note">Estes valores não vêm dos estudantes: são parâmetros do modelo. Ao editá-los, todos os gráficos são recalculados neste navegador. Aumentar o sono de referência ou as horas de alimentação e higiene diminui o saldo semanal (gráfico 1) e a composição do gráfico 3; aumentar o lazer mínimo ou reduzir os dias na EAU diminui o sono possível (gráfico 2).</p>
+</div>
+
+<h2 class="sec" id="metodologia">Metodologia</h2>
+<div class="method">
+  <p><strong>Respostas:</strong> <span id="mN">–</span>. <strong>Consulta aos dados:</strong> <span id="mUpd">–</span>. Só respostas completas entram nos gráficos; nenhum dado ausente é tratado como zero e nenhum valor extremo é descartado.</p>
+  <h3>O que os estudantes declaram</h3>
+  <ul><li>Deslocamento por dia na EAU, ida e volta (em minutos); horas semanais de aula, trabalho/estágio, trabalho doméstico, leitura, estudo extraclasse e autocuidado; maior dia de aula; período do curso.</li></ul>
+  <h3>O que o modelo presume</h3>
+  <ul><li>Sono de referência, alimentação e higiene, lazer mínimo e quantos dias por semana se vai à EAU (valores na seção Premissas).</li><li>O deslocamento semanal é o deslocamento diário × dias na EAU.</li></ul>
+  <h3>Indicadores</h3>
+  <ul><li><strong>Saldo semanal</strong> = 168 h − horas informadas − sono de referência − alimentação e higiene. Negativo: a semana não fecha.</li>
+  <li><strong>Sono possível por noite</strong> = (168 h − horas informadas − alimentação e higiene − lazer mínimo) ÷ 7. É estimativa, não sono efetivamente dormido.</li>
+  <li><strong>Dia mais pesado</strong>: o maior dia de aula informado + deslocamento diário + a parcela diária das demais atividades e premissas.</li>
+  <li><strong>Percentuais</strong> usam como denominador as respostas completas do grupo mostrado (sempre indicado como n).</li></ul>
+  <h3>Limites</h3>
+  <ul><li>Atividades podem se sobrepor (ler no ônibus, estudar durante o deslocamento); o questionário não permite detectá-las, e o modelo as soma. Isso tende a superestimar as horas ocupadas.</li>
+  <li>Os respondentes não são uma amostra aleatória: o levantamento é voluntário e não representa todos os estudantes.</li>
+  <li>Para preservar o anonimato, resultados agregados de períodos com menos de 3 respostas ficam ocultos; os pontos individuais não carregam identificação.</li></ul>
 </div>
 </main>
 <footer class="aviso">Este site não pretende fazer um levantamento definitivo, e sim chamar atenção para a exaustão dos estudantes de arquitetura e urbanismo. Entendemos que os dados aqui coletados podem não ser exatamente um retrato fiel da realidade.</footer>
