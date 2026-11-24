@@ -94,7 +94,7 @@ $('#q').oninput = ev => {
   clearTimeout(t); const q = ev.target.value.trim(); const box = $('#results');
   if (q.length < 3) { box.innerHTML = ''; return; }
   t = setTimeout(async () => {
-    const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=br&viewbox=-43.9,-22.5,-42.7,-23.2&bounded=1&q=' + encodeURIComponent(q));
+    const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=br&viewbox=-45.1,-20.7,-40.9,-23.4&bounded=1&q=' + encodeURIComponent(q));
     const js = await r.json(); box.innerHTML = '';
     js.forEach(x => { const b = document.createElement('button'); b.type = 'button';
       b.style.cssText = 'display:block;width:100%;text-align:left;margin-top:4px;font-size:12px';

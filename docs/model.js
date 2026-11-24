@@ -39,15 +39,15 @@ window.Model = (() => {
   // ---------- Validação: limites físicos e de bom senso (valores em MINUTOS, distKm em km) ----------
   // Usada pelo formulário (rejeita o envio) e pelos gráficos (ignora registros antigos que não passam).
   // Os limites não dependem das premissas editáveis: usam DEFAULTS.campusDays.
-  // Região aceita para a moradia (região metropolitana do Rio); espelhado em supabase/migrate_antifraude.sql.
-  const BBOX = { latMin: -23.2, latMax: -22.5, lngMin: -43.9, lngMax: -42.7 };
-  const LIMITS = { maxKm: 100, commuteMaxMin: 480, classWeekH: 60, classDayH: 14, workH: 60, domesticH: 60, readingH: 40, studyH: 60,
+  // Região aceita para a moradia (estado do Rio de Janeiro); espelhado em supabase/migrate_antifraude.sql.
+  const BBOX = { latMin: -23.4, latMax: -20.7, lngMin: -45.1, lngMax: -40.9 };
+  const LIMITS = { maxKm: 150, commuteMaxMin: 480, classWeekH: 60, classDayH: 14, workH: 60, domesticH: 60, readingH: 40, studyH: 60,
     selfcareH: 40, declaredWeekH: 140, declaredDayH: 22, minMinPerKm: 1.5 };
   function validate(e) {
     const L = LIMITS, h = k => H(e[k]), d = DEFAULTS.campusDays;
     if (!Number.isInteger(e.semester) || e.semester < 1 || e.semester > 10) return 'O período do curso deve ser de 1º a 10º.';
     if (!Array.isArray(e.home) || e.home.length !== 2 || !e.home.every(Number.isFinite)) return 'A moradia não tem coordenadas válidas.';
-    if (e.home[0] < BBOX.latMin || e.home[0] > BBOX.latMax || e.home[1] < BBOX.lngMin || e.home[1] > BBOX.lngMax) return 'A moradia fica fora da região metropolitana do Rio de Janeiro.';
+    if (e.home[0] < BBOX.latMin || e.home[0] > BBOX.latMax || e.home[1] < BBOX.lngMin || e.home[1] > BBOX.lngMax) return 'A moradia fica fora do estado do Rio de Janeiro.';
     if (Math.abs(e.distKm - straightKm(e.home, [UFF.lat, UFF.lng])) > 0.5) return 'A distância informada não corresponde à moradia marcada no mapa.';
     if (!Number.isFinite(e.distKm) || e.distKm <= 0) return 'A moradia não tem distância válida até a EAU.';
     if (e.distKm > L.maxKm) return `A moradia fica a mais de ${L.maxKm} km da EAU, longe demais para ir e voltar no mesmo dia.`;
