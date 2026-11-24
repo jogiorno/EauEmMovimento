@@ -1,10 +1,10 @@
-const { DEFAULTS, week, complete, validate, delivery, CATS, ALERT, MIN_N, composition, mean, median, quantile, regress, hm, fmt } = Model;
+const { DEFAULTS, week, complete, validate, delivery, REFS, refStudy, CATS, ALERT, MIN_N, composition, mean, median, quantile, regress, hm, fmt } = Model;
 const $ = s => document.querySelector(s);
 const A = JSON.parse(JSON.stringify(DEFAULTS));
 try { Object.assign(A, JSON.parse(localStorage.getItem('eau-assump-v4') || '{}')); } catch {}
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const avg = a => a.length ? mean(a) : 0;
-let entries = [], charts = {}, lastRows = [], mode1 = 'mean', mode4 = 'band', f2 = 0, discarded = 0;
+let entries = [], charts = {}, lastRows = [], mode1 = 'mean', mode4 = 'band', discarded = 0;
 
 const small = () => innerWidth < 720;
 Chart.defaults.aspectRatio = small() ? 1.1 : 2;
@@ -32,22 +32,19 @@ function render() {
   const rows = good.map(e => ({ e, w: week(e, A), hrs: e.commuteMin / 60 }));
   const n = rows.length;
   const weekCommute = avg(rows.map(r => r.w.commute));
-  const neg = rows.filter(r => r.w.free < 0).length;
   $('#headline').innerHTML = n ? `<b>${hm(avg(rows.map(r => r.w.sleepWorst)))}</b><span>de sono possível, em média, no dia mais pesado, depois de aulas, trabalho, estudo, casa, autocuidado e deslocamento.</span><small>Média de ${n} trajeto${n > 1 ? 's' : ''} válido${n > 1 ? 's' : ''}. Veja as premissas no fim da página.</small>` : '';
   $('#kpis').innerHTML = [
-    [n ? fmt(avg(rows.map(r => r.w.sleepAvail))) + ' h' : '–', 'sono possível por noite (média)'],
+    [n ? hm(avg(rows.map(r => r.w.sleepAvail))) : '–', 'sono possível por noite (média)'],
     [n ? fmt(100 * rows.filter(r => r.w.sleepWorst < 6).length / n, 0) + '%' : '–', 'podem dormir <strong>menos de 6 h</strong> no dia mais pesado', 1],
     [n ? fmt(100 * rows.filter(r => r.w.sleepWorst < 4).length / n, 0) + '%' : '–', 'podem dormir <strong>menos de 4 h</strong> no dia mais pesado', 1],
-    [n ? fmt(avg(rows.map(r => r.w.sleepWorst))) + ' h' : '–', 'sono possível no dia mais pesado (média)'],
-    [n ? fmt(avg(rows.map(r => r.e.classWeekMin / 60))) + ' h' : '–', 'horas de aula por semana (média)'],
-    [n ? fmt(avg(rows.map(r => r.e.classMaxDayMin / 60))) + ' h' : '–', 'maior dia de aula (média)'],
+    [n ? hm(avg(rows.map(r => r.e.classWeekMin / 60))) : '–', 'horas de aula por semana (média)'],
+    [n ? hm(avg(rows.map(r => r.e.classMaxDayMin / 60))) : '–', 'maior dia de aula (média)'],
     [n ? fmt(100 * rows.filter(r => r.e.workMin > 0).length / n, 0) + '%' : '–', 'trabalham ou estagiam'],
     [n, 'trajetos válidos (de ' + entries.length + ' registrados)'],
-    [fmt(avg(rows.map(r => r.hrs))) + ' h', 'deslocamento médio por dia (ida + volta)'],
-    [fmt(avg(rows.map(r => r.e.distKm))) + ' km', 'distância média em linha reta'],
-    [fmt(weekCommute) + ' h', 'deslocamento por semana'],
-    [fmt(weekCommute * 18, 0) + ' h', 'deslocamento por semestre (≈18 sem.)'],
-    [n ? fmt(100 * neg / n, 0) + '%' : '–', 'com semana que não fecha (saldo < 0)'],
+    [n ? hm(avg(rows.map(r => r.hrs))) : '–', 'deslocamento médio por dia (ida + volta)'],
+    [n ? fmt(avg(rows.map(r => r.e.distKm))) + ' km' : '–', 'distância média em linha reta'],
+    [n ? hm(weekCommute) : '–', 'deslocamento por semana'],
+    [n ? hm(weekCommute * 18) : '–', 'deslocamento por semestre (≈18 sem.)'],
   ].map(([b, s, alert]) => `<div class="card kpi${alert ? ' alert' : ''}"><b>${b}</b><span>${s}</span></div>`).join('');
 
   lastRows = rows; graph1(rows); graph2(rows); graph3(rows); graph4(rows); graph5(rows); method(rows);
@@ -75,31 +72,54 @@ function graph1(rows) {
         scales: { x: { min: 0, max: 100, title: { display: true, text: '% dos estudantes que podem dormir menos de 4 h no dia mais pesado' } }, y: { reverse: true, grid: { display: false } } } } };
   }
   mk('#g1', cfg);
-  $('#n1').textContent = n ? `${n} estudantes com respostas válidas; no dia mais pesado, ${lt(rows, 6)} (${fmt(100 * lt(rows, 6) / n, 0)}%) podem dormir menos de 6 h e ${lt(rows, 4)} (${fmt(100 * lt(rows, 4) / n, 0)}%) menos de 4 h. Períodos com menos de ${MIN_N} respostas têm o resultado oculto. Vermelho forte: menos de 4 h; vermelho claro: de 4 a 6 h.` : 'Ainda não há respostas válidas.';
+  $('#n1').textContent = n ? `${n} estudantes com respostas válidas. Períodos com menos de ${MIN_N} respostas têm o resultado oculto. Vermelho forte: menos de 4 h; vermelho claro: de 4 a 6 h.` : 'Ainda não há respostas válidas.';
   $('#p1').textContent = `Como é calculado: 24 h − deslocamento diário − maior dia de aula informado − parcela diária do trabalho/estágio e do estudo (dividida pelos ${fmt(A.campusDays)} dias na EAU) − parcela diária de trabalho doméstico, leitura e autocuidado (÷ 7) − alimentação e higiene (${fmt(A.essentialsPerDay)} h/dia). É a combinação mais pesada que o estudante declarou, não necessariamente um dia real.`;
 }
 
-// ---------- 2. Quanto conseguimos dormir? (semana média) sono possível por noite = (168 h − horas informadas − alimentação e higiene − lazer mínimo) ÷ 7 ----------
+const REF_HTML = `<h3>De onde vêm os números de referência</h3>
+<p><strong>Estes números são pisos, não metas de excelência.</strong> Não existe uma norma que diga quantas horas por semana um estudante deve dedicar a cuidar de si e a ler. Cada referência abaixo é a melhor âncora pública que encontramos, com o que ela cobre e o que não cobre.</p>
+<h3>Autocuidado: 2 h 30 min por semana (piso)</h3>
+<ul>
+<li><strong>Exercício físico.</strong> A OMS (<a href="https://www.who.int/news/item/25-11-2020-every-move-counts-towards-better-health-says-who" target="_blank" rel="noopener">diretrizes de 2020 sobre atividade física e comportamento sedentário</a>) recomenda que adultos façam de 150 a 300 minutos por semana de atividade aeróbica moderada (ou 75 a 150 minutos de atividade vigorosa). Usamos o mínimo: 150 min = <strong>2 h 30 min</strong>. É a única parte do autocuidado com meta numérica de uma entidade internacional de saúde.</li>
+<li><strong>Terapia.</strong> Não há uma quantidade de terapia que valha para todos: ela depende de haver necessidade. Como ordem de grandeza, as diretrizes do <a href="https://www.nice.org.uk/guidance/ng222/chapter/Recommendations" target="_blank" rel="noopener">NICE (Reino Unido) para depressão</a> descrevem terapia cognitivo-comportamental individual em geral com cerca de 8 sessões ou mais, de cerca de 1 hora, semanais ou quinzenais. Para quem está em tratamento, isso soma <strong>cerca de 0,5 a 1 h por semana</strong> durante alguns meses, fora o deslocamento. Esse tempo <strong>não entra</strong> na referência de todos, porque só vale para quem faz terapia.</li>
+<li><strong>Consultas médicas, exames e saúde bucal.</strong> Também não há meta semanal: são eventos esporádicos. Uma consulta ou exame de rotina costuma tomar de 1 a 3 h, contando deslocamento e espera; algumas vezes por ano, isso dá <strong>de 1 a 4 minutos por semana</strong> em média (cálculo nosso, como ilustração, não recomendação). Por isso pesam pouco na média, mas podem tomar um dia inteiro quando acontecem, e isso conta no pior dia de quem as faz na semana.</li>
+<li>As <a href="https://www.who.int/publications/i/item/9789240052192" target="_blank" rel="noopener">diretrizes de autocuidado da OMS (2022)</a> tratam de intervenções de saúde que as pessoas podem fazer por conta própria, e não fixam uma meta de horas por semana que pudéssemos usar.</li>
+</ul>
+<p><strong>Conclusão para o gráfico:</strong> a referência de autocuidado é 2 h 30 min, o piso de exercício da OMS. Quem informa menos que isso está abaixo do mínimo recomendado só para atividade física, mesmo antes de contar terapia e consultas, que somariam mais tempo para quem precisa delas.</p>
+<h3>Leitura e estudo extraclasse: 40 h de carga total, menos as aulas</h3>
+<ul>
+<li><strong>Nem a OMS nem o MEC definem horas semanais de leitura.</strong> A <a href="https://www.normasbrasil.com.br/norma/resolucao-3-2007_106888.html" target="_blank" rel="noopener">Resolução CNE/CES nº 3/2007</a> conta o "trabalho discente efetivo" na carga horária dos cursos, mas não fixa quantas horas de estudo fora de sala correspondem a cada hora de aula.</li>
+<li><strong>A âncora internacional é a carga total do estudante.</strong> O <a href="https://education.ec.europa.eu/sites/default/files/document-library-docs/ects-users-guide_en.pdf" target="_blank" rel="noopener">Guia do Sistema Europeu de Créditos (ECTS)</a> define 1 crédito como 25 a 30 horas de trabalho do estudante, e um ano em tempo integral como 60 créditos, ou seja, <strong>1.500 a 1.800 horas por ano</strong>. Esse trabalho inclui aulas, estudo, leitura e trabalhos. O ano letivo brasileiro tem no mínimo 200 dias letivos (40 semanas), o que dá <strong>de 37,5 a 45 horas por semana</strong>. Adotamos <strong>40 h por semana</strong>, o meio do intervalo.</li>
+<li><strong>A referência de cada estudante</strong> é, portanto, 40 h − as horas de aula que ele informou. Quem tem 22 h de aula teria como referência 18 h de leitura e estudo extraclasse somados. Comparamos com <strong>leitura + estudo extraclasse juntos</strong>, porque a leitura acadêmica e o estudo se misturam no dia a dia e não há referência separada para cada um.</li>
+<li>O próprio guia do ECTS ressalta que isso é carga <strong>típica</strong>, e que o tempo real varia de pessoa para pessoa e de disciplina para disciplina.</li>
+</ul>
+<h3>Limites desta comparação</h3>
+<ul>
+<li>O trabalho/estágio fica de fora dessa carga de 40 h: o ECTS trata a carga acadêmica. Quem trabalha ou estagia soma mais horas, o que agrava o quadro.</li>
+<li>Leitura por prazer não tem referência oficial; tratamos aqui leitura e estudo como carga acadêmica.</li>
+<li>As referências são de saúde e educação gerais, não de cursos de Arquitetura e Urbanismo em tempo integral com ateliê, cuja carga costuma ser maior.</li>
+</ul>`;
+
+// ---------- 2. Autocuidado e leitura: o que os estudantes gastam × referência ----------
 function graph2(rows) {
-  const r2 = f2 ? rows.filter(r => r.e.semester === f2) : rows, v = r2.map(r => r.w.sleepAvail), n = v.length, by = byTermOf(rows);
-  const pct = x => n ? fmt(100 * v.filter(s => s < x).length / n, 0) + '%' : '–';
-  $('#st2').innerHTML = [[n ? hm(mean(v)) : '–', 'média'], [n ? hm(median(v)) : '–', 'mediana'], [n ? `${hm(quantile(v, .25))} a ${hm(quantile(v, .75))}` : '–', 'quartis (25% a 75%)'],
-    [pct(6), 'abaixo de 6 h'], [pct(7), 'abaixo de 7 h'], [pct(8), 'abaixo de 8 h'], [n, 'estudantes considerados']]
+  const n = rows.length, ok = n >= MIN_N, R = REFS, m = k => ok ? mean(rows.map(r => r.w[k])) : NaN;
+  const self = m('selfcare'), read = m('reading'), study = m('study'), refS = ok ? mean(rows.map(r => refStudy(r.w))) : NaN;
+  const pie = (id, labels, data, colors, title) => mk(id, { type: 'doughnut', data: { labels, datasets: [{ data: data.map(v => +v.toFixed(2)), backgroundColor: colors, borderColor: '#fff', borderWidth: 2, offset: colors.map((_, i) => i < colors.length - 1 ? 14 : 0) }] },
+    options: { aspectRatio: 1, layout: { padding: 14 }, plugins: { title: { display: true, text: title, font: { size: 14 } }, legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+      tooltip: { callbacks: { label: c => ` ${c.label}: ${hm(c.parsed)} por semana (${fmt(100 * c.parsed / 168, 1)}% da semana)` } } } } });
+  if (ok) {
+    pie('#g2a', ['Autocuidado', 'Leitura', 'Estudo extraclasse', 'Demais atividades e descanso'], [self, read, study, 168 - self - read - study], ['#5f8a78', '#a3b8cc', '#7f9bb5', '#e3e6ea'], 'O que os estudantes informam (média, 168 h)');
+    pie('#g2b', ['Autocuidado (referência)', 'Leitura + estudo extraclasse (referência)', 'Demais atividades e descanso'], [R.selfcareH, refS, 168 - R.selfcareH - refS], ['#5f8a78', '#7f9bb5', '#e3e6ea'], 'Referência (168 h)');
+  } else { charts['#g2a']?.destroy(); charts['#g2b']?.destroy(); delete charts['#g2a']; delete charts['#g2b']; }
+  const below = f => fmt(100 * rows.filter(f).length / n, 0) + '%';
+  $('#st2').innerHTML = (ok ? [
+    [hm(self), 'autocuidado por semana (média informada)'], [hm(R.selfcareH), 'referência de autocuidado (OMS, só exercício)'],
+    [below(r => r.w.selfcare < R.selfcareH), 'abaixo da referência de autocuidado'],
+    [hm(read), 'leitura por semana (média informada)'], [hm(read + study), 'leitura + estudo extraclasse (média informada)'], [hm(refS), 'referência de leitura + estudo (40 h de carga total − aulas)'],
+    [below(r => r.w.reading + r.w.study < refStudy(r.w)), 'abaixo da referência de leitura + estudo']] : [])
     .map(([b, s]) => `<div><b>${b}</b><span>${s}</span></div>`).join('');
-  if (small()) { // celular: histograma, mais legível que dezenas de pontos sobrepostos
-    const lab = ['<2', '2–3', '3–4', '4–5', '5–6', '6–7', '7–8', '8–9', '9+'], c = lab.map(() => 0);
-    v.forEach(x => c[Math.max(0, Math.min(8, Math.floor(x) - 1))]++);
-    mk('#g2', { type: 'bar', data: { labels: lab, datasets: [{ label: 'estudantes', data: c, backgroundColor: lab.map((_, i) => i < 5 ? ALERT : i < 7 ? LIGHT_RED : GREEN) }] },
-      options: { aspectRatio: 1.1, plugins: { legend: { display: false } }, scales: { x: { title: { display: true, text: 'horas de sono possível por noite' } }, y: { ticks: { precision: 0 }, title: { display: true, text: 'estudantes' } } } } });
-  } else {
-    const y0 = f2 ? f2 - 0.6 : 0.4, y1 = f2 ? f2 + 0.6 : 10.6;
-    mk('#g2', { type: 'scatter', data: { datasets: [{ label: 'estudante', data: r2.map((r, i) => ({ x: +r.w.sleepAvail.toFixed(2), y: r.e.semester + jit(i) * (f2 ? 0.8 : 0.7), s: r.e.semester })),
-      backgroundColor: r2.map(r => r.w.sleepAvail < 6 ? ALERT : r.w.sleepAvail < 8 ? LIGHT_RED : GREEN), pointRadius: 5, pointHoverRadius: 8 }, vline(6, y0, y1, [6, 4], 1.5), vline(8, y0, y1, [2, 3], 1.5)] },
-      options: { aspectRatio: 1.8, plugins: { legend: { display: false }, tooltip: { filter: i => i.datasetIndex === 0, callbacks: { label: c => ` ${c.raw.s}º período: ${hm(c.parsed.x)} de sono possível por noite` } } },
-        scales: { x: { min: Math.min(0, Math.floor(Math.min(...v, 0))), max: Math.max(10, Math.ceil(Math.max(...v, 10))), title: { display: true, text: 'horas de sono possível por noite' } }, y: termAxis(by, y0, y1) } } });
-  }
-  $('#n2').textContent = 'Cada ponto é um estudante, sem identificação. As linhas em 6 h (tracejada) e 8 h (pontilhada) são referências de interpretação, não diagnóstico individual. Os percentuais usam como denominador só os estudantes com respostas válidas no filtro escolhido.';
-  $('#p2').textContent = `Importante: é sono possível estimado pelo modelo de ocupação do tempo, não o sono efetivamente dormido. Cálculo: (168 h − horas informadas − alimentação e higiene (${fmt(A.essentialsPerDay)} h/dia) − lazer mínimo (${fmt(A.freeMin)} h/sem)) ÷ 7. O sono não entra como atividade: é o que sobra. Deslocamento semanal = minutos por dia × ${fmt(A.campusDays)} dias na EAU.`;
+  $('#n2').textContent = ok ? `Média de ${n} estudantes com respostas válidas. As fatias de autocuidado e leitura estão destacadas; as referências são pisos mínimos, não metas de excelência. Os percentuais comparam cada estudante com a própria referência (a de leitura + estudo depende das horas de aula dele). Veja abaixo de onde vêm os números.` : `Poucas respostas válidas (n=${n}): resultado oculto.`;
+  $('#p2').innerHTML = REF_HTML;
 }
 
 // ---------- 3. Simulação: semanas de entrega (10 a 16 h por dia de aulas + trabalhos) ----------
@@ -175,8 +195,6 @@ function buildAssump() {
 function save() { try { localStorage.setItem('eau-assump-v4', JSON.stringify(A)); } catch {} render(); }
 
 buildAssump();
-const f2sel = $('#f2'); f2sel.add(new Option('Todos os períodos', 0)); for (const t of TERMS) f2sel.add(new Option(t + 'º período', t));
-f2sel.onchange = () => { f2 = +f2sel.value; graph2(lastRows); };
 const seg = (sel, set, draw) => document.querySelectorAll(sel + ' button').forEach(b => b.onclick = () => { set(b.dataset.m); document.querySelectorAll(sel + ' button').forEach(x => x.classList.toggle('on', x === b)); draw(lastRows); });
 seg('#seg1', m => mode1 = m, graph1); seg('#seg4', m => mode4 = m, graph4);
 DB.list().then(es => { entries = es; render(); }).catch(e => { $('#kpis').innerHTML = `<div class="card">${e.message}</div>`; });

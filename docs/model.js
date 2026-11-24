@@ -62,6 +62,10 @@ window.Model = (() => {
     return null;
   }
 
+  // Referências do gráfico 2 (pisos mínimos): OMS 2020 = 150 min/sem de atividade física moderada; ECTS = 1.500 a 1.800 h/ano de trabalho do estudante em tempo integral ÷ 40 semanas letivas (LDB: 200 dias) ≈ 38 a 45 h/sem; adotamos 40 h, aulas incluídas.
+  const REFS = { selfcareH: 2.5, totalWorkloadH: 40 };
+  const refStudy = w => Math.max(0, REFS.totalWorkloadH - w.class); // leitura + estudo extraclasse de referência para quem tem w.class h de aula
+
   // ---------- Simulação de semana de entrega: N horas por dia de aulas + trabalhos, somadas ao resto declarado ----------
   // Sono possível numa noite de entrega = 24 − deslocamento − horas de entrega − estágio/trabalho (por dia na EAU) − casa e autocuidado (por dia) − alimentação/higiene.
   // Leitura e estudo extraclasse ficam dentro das horas de entrega (não são somados de novo). Nunca abaixo de zero.
@@ -116,5 +120,5 @@ window.Model = (() => {
     return (Number.isFinite(h) && h < 0 && m ? '−' : '') + (a ? a + ' h' + (b ? ' ' + b + ' min' : '') : b + ' min'); }; // 5.2 → "5 h 12 min"
   const fmt = (n, d = 1) => n.toLocaleString('pt-BR', { maximumFractionDigits: d });
 
-  return { UFF, DEFAULTS, FIELDS, LIMITS, validate, delivery, ALERT, GROUPS, CATS, MIN_N, straightKm, complete, week, composition, mean, median, quantile, regress, hm, fmt };
+  return { UFF, DEFAULTS, FIELDS, LIMITS, REFS, refStudy, validate, delivery, ALERT, GROUPS, CATS, MIN_N, straightKm, complete, week, composition, mean, median, quantile, regress, hm, fmt };
 })();

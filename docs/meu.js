@@ -1,4 +1,4 @@
-const { UFF, DEFAULTS, week, complete, straightKm } = Model;
+const { UFF, DEFAULTS, week, complete, hm } = Model;
 const $ = s => document.querySelector(s);
 const fmt = (n, d = 1) => n.toLocaleString('pt-BR', { maximumFractionDigits: d });
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -13,13 +13,13 @@ else {
   // mesmas premissas editadas no dashboard (se houver)
   const A = JSON.parse(JSON.stringify(DEFAULTS));
   try { Object.assign(A, JSON.parse(localStorage.getItem('eau-assump-v4') || '{}')); } catch {}
-  const w = week(e, A), h = m => fmt(m / 60) + ' h';
+  const w = week(e, A), h = m => hm(m / 60);
 
   $('#kpis').innerHTML = [
-    [fmt(w.sleepAvail) + ' h', 'sono possível por noite (semana média)'],
-    [fmt(w.sleepWorst) + ' h', 'sono possível no seu dia mais pesado'],
-    [fmt(w.free) + ' h', 'tempo livre por semana'],
-    [fmt(w.commute) + ' h', 'deslocamento por semana'],
+    [hm(w.sleepAvail), 'sono possível por noite (média)'],
+    [hm(w.sleepWorst), 'sono possível no seu dia mais pesado'],
+    [hm(w.free), 'tempo livre por semana'],
+    [hm(w.commute), 'deslocamento por semana'],
     [fmt(e.distKm) + ' km', 'distância em linha reta até a EAU'],
   ].map(([b, s]) => `<div class="card kpi"><b>${b}</b><span>${s}</span></div>`).join('');
 
@@ -30,11 +30,11 @@ else {
   new Chart($('#c1'), { type: 'doughnut', data: { labels: CATS.map(c => c[1]),
     datasets: [{ data: CATS.map(([k]) => +Math.max(0, w[k]).toFixed(1)), backgroundColor: CATS.map(c => c[2]), borderWidth: 0 }] },
     options: { aspectRatio: innerWidth < 720 ? 1 : 1.4, plugins: { legend: { position: innerWidth < 720 ? 'bottom' : 'right' },
-      tooltip: { callbacks: { label: c => ` ${c.label}: ${fmt(c.parsed)} h` } } } } });
+      tooltip: { callbacks: { label: c => ` ${c.label}: ${hm(c.parsed)}` } } } } });
 
   $('#tbl').innerHTML = [
     ['Período do curso', e.semester + 'º'],
-    ['Deslocamento por dia na EAU (ida + volta)', `${e.commuteMin} min (${h(e.commuteMin)})`],
+    ['Deslocamento por dia na EAU (ida + volta)', h(e.commuteMin)],
     ['Aulas por semana', h(e.classWeekMin)], ['Maior dia de aula', h(e.classMaxDayMin)],
     ['Trabalho/estágio por semana', h(e.workMin)], ['Trabalho doméstico por semana', h(e.domesticMin)],
     ['Leitura por semana', h(e.readingMin)], ['Estudos extraclasse e trabalhos por semana', h(e.studyMin)],

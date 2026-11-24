@@ -20,6 +20,7 @@ h3{margin:0 0 20px;font-size:17px}canvas{max-height:340px}
 h2.sec{font-family:Manrope,system-ui,sans-serif;font-size:28px;margin:72px 0 6px;padding-top:14px;border-top:2px solid var(--fg)}.sub{color:var(--mute);margin:0 0 20px;max-width:75ch}
 .feat{padding:32px 36px}canvas.tall{max-height:560px}
 .seg{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.seg button{font-size:13px}.seg button.on{background:var(--fg);border-color:var(--fg);color:#fff}
+.pies{display:grid;grid-template-columns:1fr 1fr;gap:24px}.pies>div{max-width:460px;margin:0 auto;width:100%}
 .ctl{display:flex;align-items:center;gap:12px;margin-bottom:18px}.ctl label{margin:0}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px}
 .stats div{border:1px solid var(--line);border-radius:8px;padding:10px 14px}.stats b{display:block;font-family:Manrope,system-ui,sans-serif;font-size:20px}.stats span{font-size:12px;color:var(--mute)}
@@ -33,6 +34,7 @@ h2.sec{font-family:Manrope,system-ui,sans-serif;font-size:28px;margin:72px 0 6px
   .warn{padding-left:14px;margin-bottom:24px}
   .kpis{grid-template-columns:repeat(2,1fr);gap:12px}.big{padding:24px 20px;border-radius:10px;margin-bottom:24px}.big span{font-size:16px}
   .card{padding:18px 16px;border-radius:10px}.kpi b{font-size:24px}.kpi span{font-size:12px}
+  .pies{grid-template-columns:1fr}
   .grid{gap:16px;margin-top:16px}h3{font-size:15px;margin-bottom:14px}h2.sec{font-size:22px;margin-top:44px}.feat{padding:18px 16px}
   .terms{grid-template-columns:repeat(5,1fr)}
 }
@@ -52,13 +54,12 @@ h2.sec{font-family:Manrope,system-ui,sans-serif;font-size:28px;margin:72px 0 6px
   <p class="note" id="n1"></p><p class="note" id="p1"></p>
 </div>
 
-<h2 class="sec">2. Quanto conseguimos dormir?</h2>
-<p class="sub">Distribuição do sono possível estimado entre os estudantes, numa semana média.</p>
+<h2 class="sec">2. Autocuidado e leitura: quanto é, quanto deveria ser?</h2>
+<p class="sub">O tempo que os estudantes informam para cuidar de si e ler, comparado a referências de saúde e de educação.</p>
 <div class="card feat">
-  <div class="ctl"><label for="f2">Período</label><select id="f2"></select></div>
-  <div class="stats" id="st2"></div>
-  <canvas id="g2" class="tall"></canvas>
-  <p class="note" id="n2"></p><p class="note" id="p2"></p>
+  <div class="pies"><div><canvas id="g2a"></canvas></div><div><canvas id="g2b"></canvas></div></div>
+  <div class="stats" id="st2" style="margin-top:20px"></div>
+  <p class="note" id="n2"></p><div class="method" id="p2"></div>
 </div>
 
 <h2 class="sec">3. E nas semanas de entrega?</h2>
@@ -81,7 +82,7 @@ h2.sec{font-family:Manrope,system-ui,sans-serif;font-size:28px;margin:72px 0 6px
 
 <div class="card" style="margin-top:24px"><h3>Premissas (editáveis)</h3>
   <div class="assump" id="assump"></div>
-  <p class="note">Estes valores não vêm dos estudantes: são parâmetros do modelo. Ao editá-los, todos os gráficos são recalculados neste navegador. Aumentar o sono de referência ou as horas de alimentação e higiene diminui o sono possível em todos os gráficos; aumentar o lazer mínimo ou reduzir os dias na EAU altera o sono da semana média (gráfico 2) e o peso diário do trabalho e do estudo no pior dia (gráficos 1, 3, 4 e 5).</p>
+  <p class="note">Estes valores não vêm dos estudantes: são parâmetros do modelo. Ao editá-los, todos os gráficos são recalculados neste navegador. Aumentar o sono de referência ou as horas de alimentação e higiene diminui o sono possível em todos os gráficos; aumentar o lazer mínimo ou reduzir os dias na EAU altera o sono possível numa noite média (gráfico 5) e o peso diário do trabalho e do estudo no pior dia (gráficos 1, 3, 4 e 5).</p>
 </div>
 
 <h2 class="sec" id="metodologia">Metodologia</h2>

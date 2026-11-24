@@ -116,8 +116,9 @@ f.onsubmit = async ev => {
     try { localStorage.setItem(KEY, JSON.stringify({ body, at: Date.now() })); } catch {}
     L.polyline([H, U], { color: redShade(Math.random()), weight: 4, opacity: 1, interactive: false }).addTo(tangle);
     $('#n').textContent = +$('#n').textContent + 1;
-    const w = Model.week(body, Model.DEFAULTS);
-    msg(`Enviado! ${body.distKm.toFixed(1)} km em linha reta. Na semana média sobram ~${w.sleepAvail.toFixed(1)} h de sono por noite; no dia mais pesado, ~${w.sleepWorst.toFixed(1)} h. Veja a aba Dados.`);
+    const A = Object.assign({}, Model.DEFAULTS); try { Object.assign(A, JSON.parse(localStorage.getItem('eau-assump-v4') || '{}')); } catch {}
+    const w = Model.week(body, A), hm = Model.hm;
+    msg(`Enviado! ${body.distKm.toFixed(1)} km em linha reta. Numa noite média sobram ~${hm(w.sleepAvail)} de sono; no dia mais pesado, ~${hm(w.sleepWorst)}. Veja a aba Dados.`);
     f.reset(); f.querySelectorAll('small').forEach(x => x.textContent = ''); clear(); refresh(); lock();
   } catch (e) { msg('Erro: ' + e.message); }
   $('#send').disabled = false;
