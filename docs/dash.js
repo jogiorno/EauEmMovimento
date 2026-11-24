@@ -23,11 +23,11 @@ const PRIV = '* Períodos com poucas respostas não são exibidos, para preserva
 const T = (long, short) => small() ? short : long; // título de eixo mais curto no celular, para não cortar
 // Valor escrito na ponta de cada barra horizontal (em vez de espremê-lo no rótulo do eixo).
 Chart.register({ id: 'vlabel', afterDatasetsDraw(ch) {
-  const o = ch.options.plugins.vlabel; if (!o || !o.fmt) return;
+  const o = ch.options.plugins.vlabel; if (!o || !o.kind) return; const f = v => o.kind === 'pct' ? v + '%' : hm(v); // (função em opção do Chart.js vira 'scriptable'; por isso um texto)
   const c = ch.ctx; c.save(); c.fillStyle = css('--fg'); c.font = `600 ${small() ? 11 : 12}px 'Geist Mono', monospace`; c.textBaseline = 'middle'; c.textAlign = 'left';
-  ch.data.datasets.forEach((ds, di) => ch.getDatasetMeta(di).data.forEach((el, i) => { const v = ds.data[i]; if (v == null) return; c.fillText(o.fmt(v), Math.max(el.x, el.base) + 5, el.y); }));
+  ch.data.datasets.forEach((ds, di) => ch.getDatasetMeta(di).data.forEach((el, i) => { const v = ds.data[i]; if (v == null) return; c.fillText(f(v), Math.max(el.x, el.base) + 5, el.y); }));
   c.restore(); } });
-const VL = fmt => ({ vlabel: { fmt } });
+const VL = kind => ({ vlabel: { kind } });
 const jit = i => ((((i + 1) * 2654435761) >>> 0) % 1000) / 1000 - 0.5; // espalhamento vertical estável: pontos não se sobrepõem
 const termAxis = (by, lo, hi) => ({ reverse: true, min: lo, max: hi, grid: { display: false }, ticks: { stepSize: 1, callback: v => Number.isInteger(v) && v >= 1 && v <= 10 ? `${v}º` : '' } });
 const lineGrid = (at, color) => ({ color: c => c.tick.value === at ? css('--fg') : color || css('--line'), lineWidth: c => c.tick.value === at ? 2 : 1 });
@@ -67,7 +67,7 @@ function graph1(rows) {
   if (mode1 === 'mean') {
     const d = by.map(g => shown(g) ? +mean(g.map(sw)).toFixed(2) : null);
     cfg = { type: 'bar', data: { labels: by.map(lab), datasets: [{ label: 'sono possível no dia mais pesado', data: d, backgroundColor: d.map(v => v == null ? GREEN : sevColor(v)) }] },
-      options: { indexAxis: 'y', aspectRatio: small() ? 1.1 : 2, layout: { padding: { right: 78 } }, plugins: { ...VL(hm), legend: { display: false }, tooltip: { callbacks: { label: c => ` média: ${hm(c.parsed.x)} de sono possível no dia mais pesado` } } },
+      options: { indexAxis: 'y', aspectRatio: small() ? 1.1 : 2, layout: { padding: { right: 78 } }, plugins: { ...VL('h'), legend: { display: false }, tooltip: { callbacks: { label: c => ` média: ${hm(c.parsed.x)} de sono possível no dia mais pesado` } } },
         scales: { x: { min: lo, ticks: xt, grid: lineGrid(6), title: { display: true, text: T('horas de sono possível no dia mais pesado (linha forte = 6 h)', 'horas de sono no pior dia (linha = 6 h)') } }, y: { reverse: true, grid: { display: false } } } } };
   } else if (mode1 === 'dist') {
     cfg = { type: 'scatter', data: { datasets: [{ label: 'estudante', data: rows.map((r, i) => ({ x: +sw(r).toFixed(2), y: r.e.semester + jit(i) * 0.7, s: r.e.semester })),
@@ -77,7 +77,7 @@ function graph1(rows) {
   } else {
     const d = by.map(g => shown(g) ? +(100 * lt(g, 4) / g.length).toFixed(0) : null);
     cfg = { type: 'bar', data: { labels: by.map(lab), datasets: [{ label: '% com menos de 4 h', data: d, backgroundColor: ALERT }] },
-      options: { indexAxis: 'y', aspectRatio: small() ? 1.1 : 2, layout: { padding: { right: 48 } }, plugins: { ...VL(v => v + '%'), legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.parsed.x}% dos estudantes do período` } } },
+      options: { indexAxis: 'y', aspectRatio: small() ? 1.1 : 2, layout: { padding: { right: 48 } }, plugins: { ...VL('pct'), legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.parsed.x}% dos estudantes do período` } } },
         scales: { x: { min: 0, max: 100, title: { display: true, text: T('% dos estudantes que podem dormir menos de 4 h no dia mais pesado', '% com menos de 4 h no pior dia') } }, y: { reverse: true, grid: { display: false } } } } };
   }
   mk('#g1', cfg);
@@ -159,7 +159,7 @@ function graph4(rows) {
   if (mode4 === 'band') {
     const gs = BANDS.map(([, a, b]) => rows.filter(r => r.e.commuteMin > a && r.e.commuteMin <= b)), d = gs.map(g => shown(g) ? +mean(g.map(sw)).toFixed(2) : null);
     mk('#g4', { type: 'bar', data: { labels: BANDS.map(([l], i) => `${l}${shown(gs[i]) ? '' : '*'}`), datasets: [{ label: 'sono possível no dia mais pesado', data: d, backgroundColor: d.map(v => v == null ? GREEN : sevColor(v)) }] },
-      options: { indexAxis: 'y', aspectRatio: small() ? 1.2 : 2.4, layout: { padding: { right: 78 } }, plugins: { ...VL(hm), legend: { display: false }, tooltip: { callbacks: { label: c => ` média: ${hm(c.parsed.x)} de sono possível no dia mais pesado` } } },
+      options: { indexAxis: 'y', aspectRatio: small() ? 1.2 : 2.4, layout: { padding: { right: 78 } }, plugins: { ...VL('h'), legend: { display: false }, tooltip: { callbacks: { label: c => ` média: ${hm(c.parsed.x)} de sono possível no dia mais pesado` } } },
         scales: { x: { min: Math.min(0, Math.floor(Math.min(...d.filter(v => v != null), 0))), ticks: { stepSize: 2 }, grid: lineGrid(6), title: { display: true, text: T('horas de sono possível no dia mais pesado (linha forte = 6 h)', 'horas de sono no pior dia (linha = 6 h)') } }, y: { grid: { display: false } } } } });
     $('#lg4').innerHTML = '';
     const a = d[0], z = d[3];
@@ -185,7 +185,7 @@ function graph5(rows) {
   mk('#g5', { type: 'bar', data: { labels: by.map(lab), datasets: [
       { label: 'no dia mais pesado', data: dW, backgroundColor: ALERT },
       { label: 'em uma noite média da semana', data: dA, backgroundColor: LIGHT_RED }] },
-    options: { indexAxis: 'y', aspectRatio: small() ? 0.9 : 1.5, layout: { padding: { right: 48 } }, plugins: { ...VL(v => v + '%'), legend: { position: 'bottom', labels: { boxWidth: 12 } }, tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${c.parsed.x}% dormem menos de 6 h` } } },
+    options: { indexAxis: 'y', aspectRatio: small() ? 0.9 : 1.5, layout: { padding: { right: 48 } }, plugins: { ...VL('pct'), legend: { position: 'bottom', labels: { boxWidth: 12 } }, tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${c.parsed.x}% dormem menos de 6 h` } } },
       scales: { x: { min: 0, max: 100, title: { display: true, text: T('% dos estudantes do período que podem dormir menos de 6 h', '% que podem dormir menos de 6 h') } }, y: { reverse: true, grid: { display: false } } } } });
   $('#n5').innerHTML = `${rows.length} respostas válidas no total. Vermelho forte: sono possível no dia mais pesado abaixo de 6 h. Vermelho claro: sono possível numa noite média da semana abaixo de 6 h, para comparação. Cada barra usa como denominador os estudantes válidos do período.<br>${PRIV}`;
 }
