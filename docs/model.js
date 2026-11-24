@@ -42,7 +42,7 @@ window.Model = (() => {
   // Região aceita para a moradia (estado do Rio de Janeiro); espelhado em supabase/migrate_antifraude.sql.
   const BBOX = { latMin: -23.4, latMax: -20.7, lngMin: -45.1, lngMax: -40.9 };
   const LIMITS = { maxKm: 150, commuteMaxMin: 480, classWeekH: 60, classDayH: 14, workH: 60, domesticH: 60, readingH: 40, studyH: 60,
-    selfcareH: 40, declaredWeekH: 140, declaredDayH: 22, minMinPerKm: 1.5 };
+    selfcareH: 40, declaredWeekH: 140, declaredDayH: 30, minMinPerKm: 1.5 };
   function validate(e) {
     const L = LIMITS, h = k => H(e[k]), d = DEFAULTS.campusDays;
     if (!Number.isInteger(e.semester) || e.semester < 1 || e.semester > 10) return 'O período do curso deve ser de 1º a 10º.';
@@ -65,7 +65,7 @@ window.Model = (() => {
     const weekly = H(e.commuteMin) * d + h('classWeekMin') + h('workMin') + h('domesticMin') + h('readingMin') + h('studyMin') + h('selfcareMin');
     if (weekly > L.declaredWeekH) return `As atividades informadas somam ${weekly.toFixed(0)} h por semana; sobrariam menos de ${168 - L.declaredWeekH} h para dormir e comer. Isso contradiz a física.`;
     const day = H(e.commuteMin) + h('classMaxDayMin') + (h('workMin') + h('studyMin')) / d + (h('domesticMin') + h('readingMin') + h('selfcareMin')) / 7;
-    if (day > L.declaredDayH) return `O dia mais pesado somaria ${day.toFixed(0)} h de atividades; um dia só tem 24 h e é preciso dormir e comer.`;
+    if (day > L.declaredDayH) return `O dia mais pesado somaria ${day.toFixed(0)} h de atividades; mesmo contando que a soma de médias exagera um pouco, isso é inviável.`;
     return null;
   }
 

@@ -12,7 +12,7 @@ alter table public.entries add constraint entries_validacao check (
   and work_min <= 3600 and domestic_min <= 3600 and reading_min <= 2400 and study_min <= 3600 and selfcare_min <= 2400
   -- semana: deslocamento × 5 dias + demais atividades ≤ 140 h (sobram ≥ 28 h para dormir e comer)
   and commute_min * 5 + class_min_week + work_min + domestic_min + reading_min + study_min + selfcare_min <= 8400
-  -- dia mais pesado: ≤ 22 h de atividades
-  and commute_min + class_min_max_day + (work_min + study_min) / 5.0 + (domestic_min + reading_min + selfcare_min) / 7.0 <= 1320
+  -- dia mais pesado: ≤ 30 h de atividades (acima de 24 h o site aceita, mostra 0 h de sono e sinaliza)
+  and commute_min + class_min_max_day + (work_min + study_min) / 5.0 + (domestic_min + reading_min + selfcare_min) / 7.0 <= 1800
 ) not valid;
 notify pgrst, 'reload schema';
