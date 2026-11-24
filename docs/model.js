@@ -30,8 +30,10 @@ window.Model = (() => {
     const used = commute + cls + work + dom + read + study + self + sleep + ess;
     const sleepAvail = (168 - used + sleep - a.freeMin) / 7; // h/noite, semana média
     // Dia mais pesado: maior dia de aula + deslocamento + parcela diária das demais atividades.
-    const sleepWorst = 24 - H(e.commuteMin) - H(e.classMaxDayMin) - (work + study) / a.campusDays - (dom + read + self) / 7 - a.essentialsPerDay;
-    return { sleepAvail, sleepWorst, commute, class: cls, intern: work, domestic: dom, reading: read, study, selfcare: self, sleep, essentials: ess, free: 168 - used };
+    const rawWorst = 24 - H(e.commuteMin) - H(e.classMaxDayMin) - (work + study) / a.campusDays - (dom + read + self) / 7 - a.essentialsPerDay;
+    // Nunca abaixo de zero (só exibição; o banco não é alterado). over = a rotina declarada não cabe em 24 h.
+    const sleepWorst = Math.max(0, rawWorst), over = rawWorst < 0;
+    return { sleepAvail, sleepWorst, over, commute, class: cls, intern: work, domestic: dom, reading: read, study, selfcare: self, sleep, essentials: ess, free: 168 - used };
   }
 
   // ---------- Validação: limites físicos e de bom senso (valores em MINUTOS, distKm em km) ----------

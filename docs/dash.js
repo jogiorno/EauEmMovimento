@@ -81,7 +81,7 @@ function graph1(rows) {
         scales: { x: { min: 0, max: 100, title: { display: true, text: T('% dos estudantes que podem dormir menos de 4 h no dia mais pesado', '% com menos de 4 h no pior dia') } }, y: { reverse: true, grid: { display: false } } } } };
   }
   mk('#g1', cfg);
-  $('#n1').innerHTML = (n ? `${n} respostas válidas no total. Vermelho forte: menos de 4 h; vermelho claro: de 4 a 6 h.` : 'Ainda não há respostas válidas.') + (mode1 === 'dist' ? '' : '<br>' + PRIV);
+  $('#n1').innerHTML = (n ? `${n} respostas válidas no total. Vermelho forte: menos de 4 h; vermelho claro: de 4 a 6 h.` + (rows.some(r => r.w.over) ? ` ${rows.filter(r => r.w.over).length} delas declararam uma rotina que não cabe em 24 h no dia mais pesado; aparecem com 0 h de sono.` : '') : 'Ainda não há respostas válidas.') + (mode1 === 'dist' ? '' : '<br>' + PRIV);
   $('#p1').textContent = `Como é calculado: 24 h − deslocamento diário − maior dia de aula informado − parcela diária do trabalho/estágio e do estudo (dividida pelos ${fmt(A.campusDays)} dias na EAU) − parcela diária de trabalho doméstico, leitura e autocuidado (÷ 7) − alimentação e higiene (${fmt(A.essentialsPerDay)} h/dia). É a combinação mais pesada que o estudante declarou, não necessariamente um dia real.`;
 }
 
