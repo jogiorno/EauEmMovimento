@@ -12,9 +12,9 @@ L.control.layers({ 'OSM (escuro)': osm, 'Esri cinza escuro': esri }, null, { pos
 // se o OSM falhar repetidamente, troca sozinho para Esri
 let tileErrors = 0;
 osm.on('tileerror', () => { if (++tileErrors === 6 && map.hasLayer(osm)) { map.removeLayer(osm); esri.addTo(map); } });
-const tangle = L.layerGroup().addTo(map);
+const lines = L.layerGroup().addTo(map);
 // Tons de vermelho: cada trajeto recebe um matiz/luminosidade próprio (estável, derivado do id).
-// Sobreposições clareiam via mix-blend-mode, reforçando o emaranhado.
+// Sobreposições clareiam via mix-blend-mode.
 const redShade = seed => {
   let h = 0; for (const c of String(seed)) h = (h * 31 + c.charCodeAt(0)) >>> 0;
   const hue = (350 + (h % 30)) % 360, light = 42 + ((h >> 5) % 24), sat = 85 + ((h >> 11) % 16);
@@ -35,7 +35,7 @@ for (let i = 1; i <= 10; i++) f.semester.add(new Option(i + 'º período', i));
 DB.list().then(es => {
   $('#n').textContent = es.length;
   for (const e of es)
-    L.polyline([e.home, [UFF.lat, UFF.lng]], { color: redShade(e.id), weight: 2, opacity: 0.65, interactive: false }).addTo(tangle);
+    L.polyline([e.home, [UFF.lat, UFF.lng]], { color: redShade(e.id), weight: 2, opacity: 0.65, interactive: false }).addTo(lines);
 }).catch(e => msg(e.message));
 
 let home = null, marker = null;
@@ -114,7 +114,7 @@ f.onsubmit = async ev => {
   try {
     await DB.add(body);
     try { localStorage.setItem(KEY, JSON.stringify({ body, at: Date.now() })); } catch {}
-    L.polyline([H, U], { color: redShade(Math.random()), weight: 4, opacity: 1, interactive: false }).addTo(tangle);
+    L.polyline([H, U], { color: redShade(Math.random()), weight: 4, opacity: 1, interactive: false }).addTo(lines);
     $('#n').textContent = +$('#n').textContent + 1;
     const A = Object.assign({}, Model.DEFAULTS); try { Object.assign(A, JSON.parse(localStorage.getItem('eau-assump-v4') || '{}')); } catch {}
     const w = Model.week(body, A), hm = Model.hm;
