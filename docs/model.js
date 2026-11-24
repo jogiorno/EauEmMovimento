@@ -41,7 +41,7 @@ window.Model = (() => {
   // Os limites não dependem das premissas editáveis: usam DEFAULTS.campusDays.
   // Região aceita para a moradia (região metropolitana do Rio); espelhado em supabase/migrate_antifraude.sql.
   const BBOX = { latMin: -23.2, latMax: -22.5, lngMin: -43.9, lngMax: -42.7 };
-  const LIMITS = { maxKm: 100, commuteMaxMin: 360, classWeekH: 60, classDayH: 14, workH: 60, domesticH: 60, readingH: 40, studyH: 60,
+  const LIMITS = { maxKm: 100, commuteMaxMin: 480, classWeekH: 60, classDayH: 14, workH: 60, domesticH: 60, readingH: 40, studyH: 60,
     selfcareH: 40, declaredWeekH: 140, declaredDayH: 22, minMinPerKm: 1.5 };
   function validate(e) {
     const L = LIMITS, h = k => H(e[k]), d = DEFAULTS.campusDays;
@@ -70,14 +70,14 @@ window.Model = (() => {
   }
 
   // Filtro estatístico (só para exibição; o banco não é alterado): com amostra suficiente, descarta quem está muito acima do
-  // grupo (cerca de Tukey, Q3 + 3×IQR) no total semanal de atividades ou no deslocamento diário. Devolve o subconjunto mantido.
+  // grupo (cerca de Tukey, Q3 + 3×IQR) no total semanal de atividades (o deslocamento longo, por si só, não é cortado: já é limitado pela validação). Devolve o subconjunto mantido.
   const OUTLIER = { minN: 20, k: 3 };
   function trimOutliers(es) {
     if (es.length < OUTLIER.minN) return es;
     const tot = e => (H(e.commuteMin) * DEFAULTS.campusDays) + FIELDS.filter(f => f !== 'commuteMin' && f !== 'classMaxDayMin').reduce((s, f) => s + H(e[f]), 0);
     const fence = f => { const v = es.map(f).sort((a, b) => a - b), q = p => v[Math.floor((v.length - 1) * p)], q1 = q(0.25), q3 = q(0.75); return q3 + OUTLIER.k * (q3 - q1); };
-    const ft = fence(tot), fc = fence(e => e.commuteMin);
-    return es.filter(e => tot(e) <= ft && e.commuteMin <= fc);
+    const ft = fence(tot);
+    return es.filter(e => tot(e) <= ft);
   }
 
   // Referências do gráfico 2 (pisos mínimos): OMS 2020 = 150 min/sem de atividade física moderada; ECTS = 1.500 a 1.800 h/ano de trabalho do estudante em tempo integral ÷ 40 semanas letivas (LDB: 200 dias) ≈ 38 a 45 h/sem; adotamos 40 h, aulas incluídas.

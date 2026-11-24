@@ -4,7 +4,7 @@
 alter table public.entries drop constraint if exists entries_validacao;
 alter table public.entries add constraint entries_validacao check (
   dist_km <= 100                                        -- moradia a no máximo 100 km da EAU (ida e volta no mesmo dia)
-  and commute_min between 1 and 360                     -- até 6 h por dia, ida + volta
+  and commute_min between 1 and 480                     -- até 8 h por dia, ida + volta
   and commute_min >= dist_km * 1.5                      -- não dá para ir mais rápido que ~80 km/h em linha reta
   and class_min_week <= 3600 and class_min_max_day <= 840
   and class_min_max_day <= class_min_week
