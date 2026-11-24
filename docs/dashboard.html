@@ -27,7 +27,7 @@ h2.sec{font-family:Manrope,system-ui,sans-serif;font-size:28px;margin:72px 0 6px
 .lg{display:flex;flex-wrap:wrap;gap:6px 14px;margin:12px 0 0;font-size:12px;color:var(--mute)}.lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px}
 .smg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}.sm{padding:16px 18px}.sm h4{margin:0 0 8px;font-family:Manrope,system-ui,sans-serif;font-size:16px}.sm small{font-weight:400;color:var(--mute);font-size:12px}
 .method{font-size:13px;line-height:1.8;color:var(--mute);max-width:90ch}.method h3{color:var(--fg);margin:28px 0 8px;font-size:15px}.method li{margin:4px 0}.method strong{color:var(--fg)}
-.note{color:var(--mute);font-size:13px;line-height:1.8}.warn{border-left:3px solid var(--acc);padding-left:20px;margin:0 0 40px}
+.note{color:var(--mute);font-size:13px;line-height:1.8}.about{margin:0 0 40px;max-width:90ch}.about h3{margin:0 0 10px;font-size:15px;letter-spacing:.04em}.about h3:not(:first-child){margin-top:28px}.about p{margin:0 0 12px;color:var(--mute);font-size:14px;line-height:1.8}.about strong{color:var(--fg)}.warn{border-left:3px solid var(--acc);padding-left:20px;margin:0 0 40px}
 @media (max-width:720px){
   main{padding:24px 16px 56px}
   .hero{flex-direction:column;align-items:flex-start;gap:16px;margin-bottom:28px}.hero img{height:80px}.hero h1{font-size:38px;margin-bottom:10px}
@@ -43,7 +43,15 @@ h2.sec{font-family:Manrope,system-ui,sans-serif;font-size:28px;margin:72px 0 6px
 <main>
 <div class="hero"><div><h1>Quanto sobra para dormir?</h1><p>Somamos aulas, trabalho/estágio, trabalho doméstico, leitura, estudo, autocuidado, atividades essenciais e o tempo de deslocamento informados por cada estudante. O que restar, depois de preservar algum tempo livre, é o sono possível.</p></div></div>
 <div class="big" id="headline"></div>
-<p class="note warn">Cada estudante informa o que faz no semestre em curso (deslocamento em minutos, o restante em horas): deslocamento, aulas, trabalho/estágio, trabalho doméstico, leitura, estudos extraclasse e autocuidado. Somamos esses valores a premissas editáveis abaixo (sono, alimentação e higiene, dias na EAU, lazer mínimo); o que restar é o sono possível. O "dia mais pesado" usa o maior dia de aula informado, o deslocamento diário e a parcela diária das demais atividades. Nossas estimativas são conservadoras. Não consideramos o quadro de horários dos estudantes, já que os horários da primeira e da última aula interferem diretamente no tempo de sono, em especial para quem mora mais distante, o que complicaria ainda mais a situação de exaustão. Também não consideramos a variação de carga de trabalho extraclasse que os cursos de Arquitetura e Urbanismo costumam ter ao longo de um semestre. Este site foi produzido para chamar a atenção e iniciar uma discussão; não se pretende, com ele, fazer um levantamento definitivo.</p>
+<section class="about">
+<h3>COMO CALCULAMOS?</h3>
+<p>Cada estudante informa as atividades realizadas no semestre em curso: deslocamento (em minutos) e aulas, trabalho e estágio, trabalho doméstico, leitura, estudos extraclasse e autocuidado (em horas).</p>
+<p>A esses valores somamos algumas premissas editáveis, referentes ao tempo de sono, alimentação, higiene, dias de permanência na EAU e lazer mínimo. O tempo que resta após a contabilização dessas atividades corresponde ao <strong>sono possível estimado</strong>.</p>
+<p>O indicador de dia mais pesado considera o maior dia de aula informado, o deslocamento diário e a parcela diária das demais atividades.</p>
+<h3>SOBRE AS ESTIMATIVAS</h3>
+<p>Nossas estimativas são conservadoras. Não consideramos a distribuição efetiva das atividades ao longo da semana, a sobreposição de compromissos ou as particularidades dos quadros de horários individuais, fatores que podem tornar a rotina ainda mais exaustiva. Também não captamos integralmente a variação da carga de trabalho extraclasse, característica dos cursos de Arquitetura e Urbanismo ao longo do semestre.</p>
+<p>Este site foi desenvolvido para chamar a atenção para essas condições e iniciar uma discussão coletiva. Não se pretende, portanto, realizar um levantamento definitivo, mas tornar visível uma questão frequentemente naturalizada na formação em Arquitetura e Urbanismo.</p>
+</section>
 <div class="kpis" id="kpis"></div>
 
 <h2 class="sec">1. O pior dia.</h2>
