@@ -70,6 +70,8 @@ async function setPoint(raw) {
   try {
     const { dist, ll } = await snap(raw);
     if (dist > MAX_FROM_ROAD_M) { msg('Esse ponto está no mar, em baía ou longe de qualquer rua. Marque em terra firme.'); return; }
+    const km = Model.straightKm(ll, [UFF.lat, UFF.lng]);
+    if (km > Model.LIMITS.maxKm) { msg(`Esse ponto fica a ${km.toFixed(0)} km da EAU. O limite é ${Model.LIMITS.maxKm} km: além disso não é possível ir e voltar no mesmo dia.`); return; }
     msg();
     home = ll;
     marker = L.circleMarker(ll, { radius: 7, color: '#000', weight: 1, fillColor: '#5fd4e6', fillOpacity: 1 }).addTo(map);
@@ -102,13 +104,14 @@ const round = p => p.map(v => +v.toFixed(4));
 f.onsubmit = async ev => {
   ev.preventDefault();
   const num = n => +f[n].value;
-  if (num('classMaxDayMin') > num('classWeekMin')) { msg('O dia mais cheio de aula não pode ter mais tempo que a semana inteira.'); return; }
+  const H = round(home), U = [UFF.lat, UFF.lng];
+  const body = { home: H, semester: num('semester'), distKm: +Math.max(0.01, Model.straightKm(H, U)).toFixed(2) };
+  // só o deslocamento é digitado em minutos; os demais campos são digitados em horas e guardados em minutos
+  for (const k of Model.FIELDS) body[k] = k === 'commuteMin' ? num(k) : Math.round(num(k) * 60);
+  const bad = Model.validate(body);
+  if (bad) { msg('Dados recusados: ' + bad + ' Corrija e envie de novo.'); return; }
   $('#send').disabled = true; msg('Enviando…');
   try {
-    const H = round(home), U = [UFF.lat, UFF.lng];
-    const body = { home: H, semester: num('semester'), distKm: +Math.max(0.01, Model.straightKm(H, U)).toFixed(2) };
-    // só o deslocamento é digitado em minutos; os demais campos são digitados em horas e guardados em minutos
-    for (const k of Model.FIELDS) body[k] = k === 'commuteMin' ? num(k) : Math.round(num(k) * 60);
     await DB.add(body);
     try { localStorage.setItem(KEY, JSON.stringify({ body, at: Date.now() })); } catch {}
     L.polyline([H, U], { color: redShade(Math.random()), weight: 4, opacity: 1, interactive: false }).addTo(tangle);

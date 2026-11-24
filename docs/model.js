@@ -34,6 +34,42 @@ window.Model = (() => {
     return { sleepAvail, sleepWorst, commute, class: cls, intern: work, domestic: dom, reading: read, study, selfcare: self, sleep, essentials: ess, free: 168 - used };
   }
 
+  // ---------- Validação: limites físicos e de bom senso (valores em MINUTOS, distKm em km) ----------
+  // Usada pelo formulário (rejeita o envio) e pelos gráficos (ignora registros antigos que não passam).
+  // Os limites não dependem das premissas editáveis: usam DEFAULTS.campusDays.
+  const LIMITS = { maxKm: 100, commuteMaxMin: 360, classWeekH: 60, classDayH: 14, workH: 60, domesticH: 60, readingH: 40, studyH: 60,
+    selfcareH: 40, declaredWeekH: 140, declaredDayH: 22, minMinPerKm: 1.5 };
+  function validate(e) {
+    const L = LIMITS, h = k => H(e[k]), d = DEFAULTS.campusDays;
+    if (!Number.isInteger(e.semester) || e.semester < 1 || e.semester > 10) return 'O período do curso deve ser de 1º a 10º.';
+    if (!Number.isFinite(e.distKm) || e.distKm <= 0) return 'A moradia não tem distância válida até a EAU.';
+    if (e.distKm > L.maxKm) return `A moradia fica a mais de ${L.maxKm} km da EAU, longe demais para ir e voltar no mesmo dia.`;
+    if (FIELDS.some(k => !Number.isFinite(e[k]) || e[k] < 0)) return 'Há campos vazios ou negativos.';
+    if (e.commuteMin < 1) return 'O deslocamento diário deve ser de pelo menos 1 minuto.';
+    if (e.commuteMin > L.commuteMaxMin) return `Deslocamento de mais de ${L.commuteMaxMin / 60} h por dia (ida + volta) não é viável como rotina.`;
+    if (e.commuteMin < e.distKm * L.minMinPerKm) return `Ir e voltar em ${e.commuteMin} min é rápido demais para ${e.distKm.toFixed(1)} km em linha reta (ida + volta ≈ ${(2 * e.distKm).toFixed(1)} km).`;
+    if (h('classWeekMin') > L.classWeekH) return `Mais de ${L.classWeekH} h de aula por semana não é possível.`;
+    if (h('classMaxDayMin') > L.classDayH) return `Mais de ${L.classDayH} h de aula em um único dia não é possível.`;
+    if (e.classMaxDayMin > e.classWeekMin) return 'O dia mais cheio de aula não pode ter mais tempo que a semana inteira.';
+    if (e.classWeekMin > 7 * e.classMaxDayMin) return 'As horas de aula da semana não cabem em 7 dias com esse máximo por dia.';
+    for (const [k, lim, nome] of [['workMin', L.workH, 'trabalho/estágio'], ['domesticMin', L.domesticH, 'trabalho doméstico'], ['readingMin', L.readingH, 'leitura'],
+      ['studyMin', L.studyH, 'estudo extraclasse'], ['selfcareMin', L.selfcareH, 'autocuidado']])
+      if (h(k) > lim) return `Mais de ${lim} h semanais de ${nome} não é plausível.`;
+    const weekly = H(e.commuteMin) * d + h('classWeekMin') + h('workMin') + h('domesticMin') + h('readingMin') + h('studyMin') + h('selfcareMin');
+    if (weekly > L.declaredWeekH) return `As atividades informadas somam ${weekly.toFixed(0)} h por semana; sobrariam menos de ${168 - L.declaredWeekH} h para dormir e comer. Isso contradiz a física.`;
+    const day = H(e.commuteMin) + h('classMaxDayMin') + (h('workMin') + h('studyMin')) / d + (h('domesticMin') + h('readingMin') + h('selfcareMin')) / 7;
+    if (day > L.declaredDayH) return `O dia mais pesado somaria ${day.toFixed(0)} h de atividades; um dia só tem 24 h e é preciso dormir e comer.`;
+    return null;
+  }
+
+  // ---------- Simulação de semana de entrega: N horas por dia de aulas + trabalhos, somadas ao resto declarado ----------
+  // Sono possível numa noite de entrega = 24 − deslocamento − horas de entrega − estágio/trabalho (por dia na EAU) − casa e autocuidado (por dia) − alimentação/higiene.
+  // Leitura e estudo extraclasse ficam dentro das horas de entrega (não são somados de novo). Nunca abaixo de zero.
+  function delivery(e, a, hours) {
+    const raw = 24 - H(e.commuteMin) - hours - H(e.workMin) / a.campusDays - (H(e.domesticMin) + H(e.selfcareMin)) / 7 - a.essentialsPerDay;
+    return Math.max(0, raw);
+  }
+
   // ---------- Categorias, grupos e cores: ÚNICA fonte para todos os gráficos ----------
   // Grupos e paleta semântica: azul acinzentado = formação; terracota = trabalho; cinza = vida cotidiana;
   // verde acinzentado = recuperação. O vermelho (#d6001c) é reservado para déficit e situações críticas.
@@ -80,5 +116,5 @@ window.Model = (() => {
     return (Number.isFinite(h) && h < 0 && m ? '−' : '') + (a ? a + ' h' + (b ? ' ' + b + ' min' : '') : b + ' min'); }; // 5.2 → "5 h 12 min"
   const fmt = (n, d = 1) => n.toLocaleString('pt-BR', { maximumFractionDigits: d });
 
-  return { UFF, DEFAULTS, FIELDS, ALERT, GROUPS, CATS, MIN_N, straightKm, complete, week, composition, mean, median, quantile, regress, hm, fmt };
+  return { UFF, DEFAULTS, FIELDS, LIMITS, validate, delivery, ALERT, GROUPS, CATS, MIN_N, straightKm, complete, week, composition, mean, median, quantile, regress, hm, fmt };
 })();

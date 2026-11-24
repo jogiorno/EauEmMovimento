@@ -44,16 +44,16 @@ h2.sec{font-family:Manrope,system-ui,sans-serif;font-size:28px;margin:72px 0 6px
 <p class="note warn">Cada estudante informa o que faz no semestre em curso (deslocamento em minutos, o restante em horas): deslocamento, aulas, trabalho/estágio, trabalho doméstico, leitura, estudos extraclasse e autocuidado. Somamos esses valores a premissas editáveis abaixo (sono, alimentação e higiene, dias na EAU, lazer mínimo); o que restar é o sono possível. O "dia mais pesado" usa o maior dia de aula informado, o deslocamento diário e a parcela diária das demais atividades.</p>
 <div class="kpis" id="kpis"></div>
 
-<h2 class="sec">1. A semana não fecha.</h2>
-<p class="sub">Quantas horas faltam para acomodar as atividades e as premissas de tempo consideradas?</p>
+<h2 class="sec">1. O pior dia.</h2>
+<p class="sub">Quantas horas de sono sobram no dia mais pesado da semana, depois de aulas, deslocamento e do resto da rotina?</p>
 <div class="card feat">
-  <div class="seg" id="seg1"><button type="button" data-m="mean" class="on">Saldo médio por período</button><button type="button" data-m="dist">Distribuição individual</button><button type="button" data-m="neg">Estudantes com saldo negativo</button></div>
+  <div class="seg" id="seg1"><button type="button" data-m="mean" class="on">Média por período</button><button type="button" data-m="dist">Distribuição individual</button><button type="button" data-m="crit">Menos de 4 h</button></div>
   <canvas id="g1" class="tall"></canvas>
   <p class="note" id="n1"></p><p class="note" id="p1"></p>
 </div>
 
 <h2 class="sec">2. Quanto conseguimos dormir?</h2>
-<p class="sub">Distribuição do sono possível estimado entre os estudantes.</p>
+<p class="sub">Distribuição do sono possível estimado entre os estudantes, numa semana média.</p>
 <div class="card feat">
   <div class="ctl"><label for="f2">Período</label><select id="f2"></select></div>
   <div class="stats" id="st2"></div>
@@ -61,40 +61,46 @@ h2.sec{font-family:Manrope,system-ui,sans-serif;font-size:28px;margin:72px 0 6px
   <p class="note" id="n2"></p><p class="note" id="p2"></p>
 </div>
 
-<h2 class="sec">3. Para onde vão as 168 horas?</h2>
-<p class="sub">Distribuição semanal do tempo entre formação, trabalho, reprodução cotidiana e recuperação.</p>
-<div class="card">
-  <div class="seg" id="seg3"><button type="button" data-m="full" class="on">Declarado + premissas</button><button type="button" data-m="declared">Só o declarado</button></div>
+<h2 class="sec">3. E nas semanas de entrega?</h2>
+<p class="sub">Simulação: e se, na semana de entrega, aulas e trabalhos tomassem de 10 a 16 horas por dia?</p>
+<div class="card feat">
+  <div class="stats" id="st3"></div>
   <canvas id="g3" class="tall"></canvas>
   <p class="note" id="n3"></p><p class="note" id="p3"></p>
 </div>
 
-<h2 class="sec">4. A distância também consome tempo.</h2>
-<p class="sub">Como o tempo de deslocamento se relaciona com o sono possível?</p>
-<div class="card"><canvas id="g4"></canvas><div class="lg" id="lg4"></div><p class="note" id="n4"></p><p class="note" id="p4"></p></div>
+<h2 class="sec">4. A distância também consome o pior dia.</h2>
+<p class="sub">Quanto do sono possível no dia mais pesado o deslocamento leva?</p>
+<div class="card">
+  <div class="seg" id="seg4"><button type="button" data-m="band" class="on">Por faixa de deslocamento</button><button type="button" data-m="dots">Cada estudante</button></div>
+  <canvas id="g4"></canvas><div class="lg" id="lg4"></div><p class="note" id="n4"></p><p class="note" id="p4"></p></div>
 
-<h2 class="sec">5. Como a sobrecarga muda ao longo do curso?</h2>
-<p class="sub">Comparação das atividades acadêmicas, profissionais e do sono possível.</p>
-<div class="smg" id="sm"></div>
-<p class="note" id="n5"></p>
+<h2 class="sec">5. Quantos dormem menos de 6 horas, por período?</h2>
+<p class="sub">Percentual de estudantes de cada período que podem dormir menos de 6 h.</p>
+<div class="card feat"><canvas id="g5" class="tall"></canvas><p class="note" id="n5"></p></div>
 
 <div class="card" style="margin-top:24px"><h3>Premissas (editáveis)</h3>
   <div class="assump" id="assump"></div>
-  <p class="note">Estes valores não vêm dos estudantes: são parâmetros do modelo. Ao editá-los, todos os gráficos são recalculados neste navegador. Aumentar o sono de referência ou as horas de alimentação e higiene diminui o saldo semanal (gráfico 1) e a composição do gráfico 3; aumentar o lazer mínimo ou reduzir os dias na EAU diminui o sono possível (gráfico 2).</p>
+  <p class="note">Estes valores não vêm dos estudantes: são parâmetros do modelo. Ao editá-los, todos os gráficos são recalculados neste navegador. Aumentar o sono de referência ou as horas de alimentação e higiene diminui o sono possível em todos os gráficos; aumentar o lazer mínimo ou reduzir os dias na EAU altera o sono da semana média (gráfico 2) e o peso diário do trabalho e do estudo no pior dia (gráficos 1, 3, 4 e 5).</p>
 </div>
 
 <h2 class="sec" id="metodologia">Metodologia</h2>
 <div class="method">
-  <p><strong>Respostas:</strong> <span id="mN">–</span>. <strong>Consulta aos dados:</strong> <span id="mUpd">–</span>. Só respostas completas entram nos gráficos; nenhum dado ausente é tratado como zero e nenhum valor extremo é descartado.</p>
+  <p><strong>Respostas:</strong> <span id="mN">–</span>. <strong>Consulta aos dados:</strong> <span id="mUpd">–</span>. Só respostas completas e coerentes entram nos gráficos; nenhum dado ausente é tratado como zero. Valores extremos plausíveis são mantidos.</p>
   <h3>O que os estudantes declaram</h3>
   <ul><li>Deslocamento por dia na EAU, ida e volta (em minutos); horas semanais de aula, trabalho/estágio, trabalho doméstico, leitura, estudo extraclasse e autocuidado; maior dia de aula; período do curso.</li></ul>
   <h3>O que o modelo presume</h3>
   <ul><li>Sono de referência, alimentação e higiene, lazer mínimo e quantos dias por semana se vai à EAU (valores na seção Premissas).</li><li>O deslocamento semanal é o deslocamento diário × dias na EAU.</li></ul>
   <h3>Indicadores</h3>
-  <ul><li><strong>Saldo semanal</strong> = 168 h − horas informadas − sono de referência − alimentação e higiene. Negativo: a semana não fecha.</li>
-  <li><strong>Sono possível por noite</strong> = (168 h − horas informadas − alimentação e higiene − lazer mínimo) ÷ 7. É estimativa, não sono efetivamente dormido.</li>
-  <li><strong>Dia mais pesado</strong>: o maior dia de aula informado + deslocamento diário + a parcela diária das demais atividades e premissas.</li>
+  <ul><li><strong>Sono possível por noite</strong> = (168 h − horas informadas − alimentação e higiene − lazer mínimo) ÷ 7. É estimativa, não sono efetivamente dormido.</li>
+  <li><strong>Dia mais pesado</strong> = 24 h − deslocamento diário − maior dia de aula informado − parcela diária das demais atividades − alimentação e higiene.</li>
+  <li><strong>Semana de entrega</strong> (simulação, não dado coletado): o dia passa a ter de 10 a 16 h de aulas e trabalhos; o resto declarado permanece.</li>
   <li><strong>Percentuais</strong> usam como denominador as respostas completas do grupo mostrado (sempre indicado como n).</li></ul>
+  <h3>O que o site não aceita</h3>
+  <ul><li>Moradia a mais de 100 km da EAU em linha reta (inviável ir e voltar no mesmo dia) ou em mar, baía e locais sem via próxima.</li>
+  <li>Deslocamento diário acima de 6 h, ou rápido demais para a distância (acima de ~80 km/h em linha reta).</li>
+  <li>Dia de aula maior que a semana; mais de 60 h/sem de aula, trabalho, doméstico ou estudo; mais de 40 h/sem de leitura ou autocuidado; mais de 14 h de aula em um dia.</li>
+  <li>Atividades que somem mais de 140 h na semana ou mais de 22 h no dia mais pesado: contradizem as 168 h da semana e as 24 h do dia.</li></ul>
   <h3>Limites</h3>
   <ul><li>Atividades podem se sobrepor (ler no ônibus, estudar durante o deslocamento); o questionário não permite detectá-las, e o modelo as soma. Isso tende a superestimar as horas ocupadas.</li>
   <li>Os respondentes não são uma amostra aleatória: o levantamento é voluntário e não representa todos os estudantes.</li>

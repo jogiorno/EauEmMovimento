@@ -44,21 +44,21 @@ html,body{height:100%}body{display:flex;flex-direction:column;height:100vh;heigh
     <label>Período do curso</label>
     <select name="semester"></select>
     <label>Tempo de deslocamento por dia na EAU, ida + volta, transporte + caminhada (min)</label>
-    <input name="commuteMin" data-min type="number" min="1" max="600" step="1" required placeholder="ex.: 120">
+    <input name="commuteMin" data-min type="number" min="1" max="360" step="1" required placeholder="ex.: 120">
     <label>Tempo de aula por semana neste semestre (horas)</label>
     <input name="classWeekMin" data-h type="number" min="1" max="60" step="0.5" required placeholder="ex.: 28">
     <label>Máximo de tempo em aula em um único dia neste semestre (horas)</label>
-    <input name="classMaxDayMin" data-h type="number" min="0.5" max="16" step="0.5" required placeholder="ex.: 8">
+    <input name="classMaxDayMin" data-h type="number" min="0.5" max="14" step="0.5" required placeholder="ex.: 8">
     <label>Trabalho/estágio por semana (horas; 0 se não trabalha)</label>
-    <input name="workMin" data-h type="number" min="0" max="80" step="0.5" required placeholder="ex.: 20">
+    <input name="workMin" data-h type="number" min="0" max="60" step="0.5" required placeholder="ex.: 20">
     <label>Trabalho doméstico por semana: cuidado com familiares, mercado, limpeza da casa etc. (horas)</label>
-    <input name="domesticMin" data-h type="number" min="0" max="80" step="0.5" required placeholder="ex.: 7">
+    <input name="domesticMin" data-h type="number" min="0" max="60" step="0.5" required placeholder="ex.: 7">
     <label>Leitura por semana (horas)</label>
-    <input name="readingMin" data-h type="number" min="0" max="80" step="0.5" required placeholder="ex.: 3">
+    <input name="readingMin" data-h type="number" min="0" max="40" step="0.5" required placeholder="ex.: 3">
     <label>Estudos extraclasse e trabalhos por semana: ateliê, projetos, entregas (horas)</label>
-    <input name="studyMin" data-h type="number" min="0" max="80" step="0.5" required placeholder="ex.: 15">
+    <input name="studyMin" data-h type="number" min="0" max="60" step="0.5" required placeholder="ex.: 15">
     <label>Autocuidado por semana: terapia, exercício físico, consultas, exames etc. (horas)</label>
-    <input name="selfcareMin" data-h type="number" min="0" max="80" step="0.5" required placeholder="ex.: 4">
+    <input name="selfcareMin" data-h type="number" min="0" max="40" step="0.5" required placeholder="ex.: 4">
     <p>Por privacidade, as coordenadas são arredondadas (~10 m) e nenhum nome é guardado. Use um ponto próximo, não necessariamente a porta de casa.</p>
     <button class="pri" style="width:100%;margin-top:18px" id="send">Enviar trajeto</button>
   </form>
