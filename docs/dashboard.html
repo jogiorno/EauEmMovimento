@@ -9,7 +9,7 @@ main{max-width:1160px;margin:0 auto;padding:56px 40px 96px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:28px 32px}
 .kpi b{display:block;font-size:32px;line-height:1.2;margin-bottom:8px;color:var(--acc)}.kpi span{color:var(--mute);font-size:13px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(420px,100%),1fr));gap:24px;margin-top:24px}
-h3{margin:0 0 20px;font-size:17px}canvas{max-height:340px}
+h3{margin:0 0 20px;font-size:17px}canvas{max-width:100%}
 .assump{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px}
 .assump input{width:100%}.terms{display:grid;grid-template-columns:repeat(10,1fr);gap:8px}.terms input{padding:9px 4px;width:100%}
 .hero{display:flex;gap:32px;align-items:center;margin-bottom:48px}.hero h1{margin:0 0 16px;font-size:clamp(40px,6vw,64px);line-height:1.1}.hero p{max-width:60ch}.hero p{margin:0;color:var(--mute)}
@@ -18,7 +18,7 @@ h3{margin:0 0 20px;font-size:17px}canvas{max-height:340px}
 .big span{display:block;margin-top:16px;font-size:20px;line-height:1.5;max-width:42ch}.big small{display:block;margin-top:12px;font-size:13px;opacity:.85}
 .kpi.alert{background:var(--acc);border-color:var(--acc)}.kpi.alert b,.kpi.alert span{color:#fff}.kpi.alert strong{font-weight:800}
 h2.sec{font-family:Manrope,system-ui,sans-serif;font-size:28px;margin:72px 0 6px;padding-top:14px;border-top:2px solid var(--fg)}.sub{color:var(--mute);margin:0 0 20px;max-width:75ch}
-.feat{padding:32px 36px}canvas.tall{max-height:560px}
+.feat{padding:32px 36px}
 .seg{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.seg button{font-size:13px}.seg button.on{background:var(--fg);border-color:var(--fg);color:#fff}
 .pies{display:grid;grid-template-columns:1fr 1fr;gap:24px}.pies>div{max-width:460px;margin:0 auto;width:100%}
 .ctl{display:flex;align-items:center;gap:12px;margin-bottom:18px}.ctl label{margin:0}
@@ -96,7 +96,7 @@ h2.sec{font-family:Manrope,system-ui,sans-serif;font-size:28px;margin:72px 0 6px
   <ul><li><strong>Sono possível por noite</strong> = (168 h − horas informadas − alimentação e higiene − lazer mínimo) ÷ 7. É estimativa, não sono efetivamente dormido.</li>
   <li><strong>Dia mais pesado</strong> = 24 h − deslocamento diário − maior dia de aula informado − parcela diária das demais atividades − alimentação e higiene.</li>
   <li><strong>Semana de entrega</strong> (simulação, não dado coletado): o dia passa a ter de 10 a 16 h de aulas e trabalhos; o resto declarado permanece.</li>
-  <li><strong>Percentuais</strong> usam como denominador as respostas completas do grupo mostrado (sempre indicado como n).</li></ul>
+  <li><strong>Percentuais</strong> usam como denominador as respostas completas do grupo mostrado.</li></ul>
   <h3>O que o site não aceita</h3>
   <ul><li>Moradia a mais de 100 km da EAU em linha reta (inviável ir e voltar no mesmo dia) ou em mar, baía e locais sem via próxima.</li>
   <li>Deslocamento diário acima de 6 h, ou rápido demais para a distância (acima de ~80 km/h em linha reta).</li>
@@ -105,7 +105,7 @@ h2.sec{font-family:Manrope,system-ui,sans-serif;font-size:28px;margin:72px 0 6px
   <h3>Limites</h3>
   <ul><li>Atividades podem se sobrepor (ler no ônibus, estudar durante o deslocamento); o questionário não permite detectá-las, e o modelo as soma. Isso tende a superestimar as horas ocupadas.</li>
   <li>Os respondentes não são uma amostra aleatória: o levantamento é voluntário e não representa todos os estudantes.</li>
-  <li>Para preservar o anonimato, resultados agregados de períodos com menos de 3 respostas ficam ocultos; os pontos individuais não carregam identificação.</li></ul>
+  <li>Para preservar o anonimato, resultados agregados de períodos com poucas respostas (menos de 3) não são exibidos e aparecem marcados com *; os pontos individuais não carregam identificação.</li></ul>
 </div>
 </main>
 <footer class="aviso">Este site não pretende fazer um levantamento definitivo, e sim chamar atenção para a exaustão dos estudantes de arquitetura e urbanismo. Entendemos que os dados aqui coletados podem não ser exatamente um retrato fiel da realidade.</footer>

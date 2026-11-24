@@ -10,7 +10,7 @@ const small = () => innerWidth < 720;
 Chart.defaults.aspectRatio = small() ? 1.1 : 2;
 function mk(id, cfg) {
   charts[id]?.destroy();
-  Chart.defaults.font.family = "'Geist Mono', monospace"; Chart.defaults.color = css('--mute'); Chart.defaults.borderColor = css('--line');
+  Chart.defaults.font.family = "'Geist Mono', monospace"; Chart.defaults.font.size = small() ? 11 : 12; Chart.defaults.color = css('--mute'); Chart.defaults.borderColor = css('--line');
   charts[id] = new Chart($(id), cfg);
 }
 
@@ -18,9 +18,18 @@ function mk(id, cfg) {
 const TERMS = Array.from({ length: 10 }, (_, i) => i + 1);
 const byTermOf = rows => TERMS.map(t => rows.filter(r => r.e.semester === t));
 const shown = g => g.length >= MIN_N; // privacidade: períodos com poucas respostas não mostram resultados agregados
-const nTxt = g => `n=${g.length}${g.length && !shown(g) ? ', oculto' : ''}`;
+const lab = (g, i) => `${i + 1}º${shown(g) ? '' : '*'}`; // asterisco = período com poucas respostas (oculto)
+const PRIV = '* Períodos com poucas respostas não são exibidos, para preservar a privacidade.';
+const T = (long, short) => small() ? short : long; // título de eixo mais curto no celular, para não cortar
+// Valor escrito na ponta de cada barra horizontal (em vez de espremê-lo no rótulo do eixo).
+Chart.register({ id: 'vlabel', afterDatasetsDraw(ch) {
+  const o = ch.options.plugins.vlabel; if (!o || !o.fmt) return;
+  const c = ch.ctx; c.save(); c.fillStyle = css('--fg'); c.font = `600 ${small() ? 11 : 12}px 'Geist Mono', monospace`; c.textBaseline = 'middle'; c.textAlign = 'left';
+  ch.data.datasets.forEach((ds, di) => ch.getDatasetMeta(di).data.forEach((el, i) => { const v = ds.data[i]; if (v == null) return; c.fillText(o.fmt(v), Math.max(el.x, el.base) + 5, el.y); }));
+  c.restore(); } });
+const VL = fmt => ({ vlabel: { fmt } });
 const jit = i => ((((i + 1) * 2654435761) >>> 0) % 1000) / 1000 - 0.5; // espalhamento vertical estável: pontos não se sobrepõem
-const termAxis = (by, lo, hi) => ({ reverse: true, min: lo, max: hi, grid: { display: false }, ticks: { stepSize: 1, callback: v => Number.isInteger(v) && v >= 1 && v <= 10 ? `${v}º (n=${by[v - 1].length})` : '' } });
+const termAxis = (by, lo, hi) => ({ reverse: true, min: lo, max: hi, grid: { display: false }, ticks: { stepSize: 1, callback: v => Number.isInteger(v) && v >= 1 && v <= 10 ? `${v}º` : '' } });
 const lineGrid = (at, color) => ({ color: c => c.tick.value === at ? css('--fg') : color || css('--line'), lineWidth: c => c.tick.value === at ? 2 : 1 });
 const vline = (x, lo, hi, dash, w) => ({ type: 'line', data: [{ x, y: lo }, { x, y: hi }], borderColor: css('--fg'), borderDash: dash, borderWidth: w, pointRadius: 0, label: 'ref' });
 const GREEN = '#7a9a8a', GRAY = '#8d98a8', TERRA = '#c0653f', BLUE = '#5b7a99', LIGHT_RED = '#e0a58f';
@@ -57,22 +66,22 @@ function graph1(rows) {
   let cfg;
   if (mode1 === 'mean') {
     const d = by.map(g => shown(g) ? +mean(g.map(sw)).toFixed(2) : null);
-    cfg = { type: 'bar', data: { labels: by.map((g, i) => `${i + 1}º (${nTxt(g)})${d[i] == null ? '' : ' · ' + hm(d[i])}`), datasets: [{ label: 'sono possível no dia mais pesado', data: d, backgroundColor: d.map(v => v == null ? GREEN : sevColor(v)) }] },
-      options: { indexAxis: 'y', aspectRatio: small() ? 1.1 : 2, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` média: ${hm(c.parsed.x)} de sono possível no dia mais pesado` } } },
-        scales: { x: { min: lo, ticks: xt, grid: lineGrid(6), title: { display: true, text: 'horas de sono possível no dia mais pesado (linha forte = 6 h)' } }, y: { reverse: true, grid: { display: false } } } } };
+    cfg = { type: 'bar', data: { labels: by.map(lab), datasets: [{ label: 'sono possível no dia mais pesado', data: d, backgroundColor: d.map(v => v == null ? GREEN : sevColor(v)) }] },
+      options: { indexAxis: 'y', aspectRatio: small() ? 1.1 : 2, layout: { padding: { right: 78 } }, plugins: { ...VL(hm), legend: { display: false }, tooltip: { callbacks: { label: c => ` média: ${hm(c.parsed.x)} de sono possível no dia mais pesado` } } },
+        scales: { x: { min: lo, ticks: xt, grid: lineGrid(6), title: { display: true, text: T('horas de sono possível no dia mais pesado (linha forte = 6 h)', 'horas de sono no pior dia (linha = 6 h)') } }, y: { reverse: true, grid: { display: false } } } } };
   } else if (mode1 === 'dist') {
     cfg = { type: 'scatter', data: { datasets: [{ label: 'estudante', data: rows.map((r, i) => ({ x: +sw(r).toFixed(2), y: r.e.semester + jit(i) * 0.7, s: r.e.semester })),
       backgroundColor: rows.map(r => sevColor(sw(r))), pointRadius: 5, pointHoverRadius: 8 }, vline(6, 0.4, 10.6, [6, 4], 1.5), vline(4, 0.4, 10.6, [], 2)] },
       options: { aspectRatio: small() ? 1 : 1.8, plugins: { legend: { display: false }, tooltip: { filter: i => i.datasetIndex === 0, callbacks: { label: c => ` ${c.raw.s}º período: ${hm(c.parsed.x)} de sono possível no dia mais pesado` } } },
-        scales: { x: { min: lo, max: Math.max(12, Math.ceil(Math.max(...rows.map(sw), 12))), ticks: xt, title: { display: true, text: 'horas de sono possível no dia mais pesado (tracejada = 6 h, cheia = 4 h)' } }, y: termAxis(by, 0.4, 10.6) } } };
+        scales: { x: { min: lo, max: Math.max(12, Math.ceil(Math.max(...rows.map(sw), 12))), ticks: xt, title: { display: true, text: T('horas de sono possível no dia mais pesado (tracejada = 6 h, cheia = 4 h)', 'horas de sono no pior dia') } }, y: termAxis(by, 0.4, 10.6) } } };
   } else {
     const d = by.map(g => shown(g) ? +(100 * lt(g, 4) / g.length).toFixed(0) : null);
-    cfg = { type: 'bar', data: { labels: by.map((g, i) => `${i + 1}º (${nTxt(g)})${d[i] == null ? '' : ` · ${lt(g, 4)} de ${g.length}`}`), datasets: [{ label: '% com menos de 4 h', data: d, backgroundColor: ALERT }] },
-      options: { indexAxis: 'y', aspectRatio: small() ? 1.1 : 2, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.parsed.x}% dos estudantes do período` } } },
-        scales: { x: { min: 0, max: 100, title: { display: true, text: '% dos estudantes que podem dormir menos de 4 h no dia mais pesado' } }, y: { reverse: true, grid: { display: false } } } } };
+    cfg = { type: 'bar', data: { labels: by.map(lab), datasets: [{ label: '% com menos de 4 h', data: d, backgroundColor: ALERT }] },
+      options: { indexAxis: 'y', aspectRatio: small() ? 1.1 : 2, layout: { padding: { right: 48 } }, plugins: { ...VL(v => v + '%'), legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.parsed.x}% dos estudantes do período` } } },
+        scales: { x: { min: 0, max: 100, title: { display: true, text: T('% dos estudantes que podem dormir menos de 4 h no dia mais pesado', '% com menos de 4 h no pior dia') } }, y: { reverse: true, grid: { display: false } } } } };
   }
   mk('#g1', cfg);
-  $('#n1').textContent = n ? `${n} estudantes com respostas válidas. Períodos com menos de ${MIN_N} respostas têm o resultado oculto. Vermelho forte: menos de 4 h; vermelho claro: de 4 a 6 h.` : 'Ainda não há respostas válidas.';
+  $('#n1').innerHTML = (n ? `${n} respostas válidas no total. Vermelho forte: menos de 4 h; vermelho claro: de 4 a 6 h.` : 'Ainda não há respostas válidas.') + (mode1 === 'dist' ? '' : '<br>' + PRIV);
   $('#p1').textContent = `Como é calculado: 24 h − deslocamento diário − maior dia de aula informado − parcela diária do trabalho/estágio e do estudo (dividida pelos ${fmt(A.campusDays)} dias na EAU) − parcela diária de trabalho doméstico, leitura e autocuidado (÷ 7) − alimentação e higiene (${fmt(A.essentialsPerDay)} h/dia). É a combinação mais pesada que o estudante declarou, não necessariamente um dia real.`;
 }
 
@@ -118,7 +127,7 @@ function graph2(rows) {
     [hm(read), 'leitura por semana (média informada)'], [hm(read + study), 'leitura + estudo extraclasse (média informada)'], [hm(refS), 'referência de leitura + estudo (40 h de carga total − aulas)'],
     [below(r => r.w.reading + r.w.study < refStudy(r.w)), 'abaixo da referência de leitura + estudo']] : [])
     .map(([b, s]) => `<div><b>${b}</b><span>${s}</span></div>`).join('');
-  $('#n2').textContent = ok ? `Média de ${n} estudantes com respostas válidas. As fatias de autocuidado e leitura estão destacadas; as referências são pisos mínimos, não metas de excelência. Os percentuais comparam cada estudante com a própria referência (a de leitura + estudo depende das horas de aula dele). Veja abaixo de onde vêm os números.` : `Poucas respostas válidas (n=${n}): resultado oculto.`;
+  $('#n2').textContent = ok ? `Média de ${n} respostas válidas no total. As fatias de autocuidado e leitura estão destacadas; as referências são pisos mínimos, não metas de excelência. Os percentuais comparam cada estudante com a própria referência (a de leitura + estudo depende das horas de aula dele). Veja abaixo de onde vêm os números.` : `Poucas respostas válidas: resultado oculto para preservar a privacidade.`;
   $('#p2').innerHTML = REF_HTML;
 }
 
@@ -136,10 +145,10 @@ function graph3(rows) {
       { ...line('6 h (referência)', DELIV.map(() => 6), GRAY, [6, 4], 1.5), pointRadius: 0 }] },
     options: { aspectRatio: small() ? 1.1 : 2, interaction: { mode: 'index', intersect: false },
       plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } }, tooltip: { callbacks: { label: c => c.dataset.label.startsWith('6 h') ? null : ` ${c.dataset.label}: ${hm(c.parsed.y)}` } } },
-      scales: { x: { title: { display: true, text: 'horas por dia de aulas + trabalhos na semana de entrega' } }, y: { min: 0, suggestedMax: 10, ticks: { stepSize: 2 }, title: { display: true, text: 'horas de sono possível por noite' } } } } });
+      scales: { x: { title: { display: true, text: T('horas por dia de aulas + trabalhos na semana de entrega', 'horas/dia de aulas + trabalhos') } }, y: { min: 0, suggestedMax: 10, ticks: { stepSize: 2 }, title: { display: true, text: T('horas de sono possível por noite', 'horas de sono/noite') } } } } });
   $('#st3').innerHTML = [10, 12, 14, 16].map(h => { const v = vals[DELIV.indexOf(h)], p = x => fmt(100 * v.filter(s => s < x).length / n, 0) + '%';
     return `<div><b>${ok ? p(6) + ' · ' + p(4) : '–'}</b><span>${h} h/dia: abaixo de 6 h · abaixo de 4 h</span></div>`; }).join('');
-  $('#n3').textContent = ok ? `Simulação com ${n} estudantes: cada um mantém o que declarou (deslocamento, trabalho/estágio, casa, autocuidado) e passa de 10 a 16 horas por dia em aulas e trabalhos acadêmicos. Os percentuais são de estudantes que ficariam abaixo de 6 h e de 4 h de sono possível. Nunca abaixo de zero: 0 h significa que o dia não tem horas sobrando.` : `Poucas respostas válidas (n=${n}): resultado oculto.`;
+  $('#n3').textContent = ok ? `Simulação com ${n} respostas válidas no total: cada um mantém o que declarou (deslocamento, trabalho/estágio, casa, autocuidado) e passa de 10 a 16 horas por dia em aulas e trabalhos acadêmicos. Os percentuais são de estudantes que ficariam abaixo de 6 h e de 4 h de sono possível. Nunca abaixo de zero: 0 h significa que o dia não tem horas sobrando.` : `Poucas respostas válidas: resultado oculto para preservar a privacidade.`;
   $('#p3').textContent = `Isto é uma simulação, não um dado coletado. Sono possível na noite de entrega = 24 h − deslocamento diário − horas de entrega − trabalho/estágio (parcela por dia na EAU, ÷ ${fmt(A.campusDays)}) − trabalho doméstico e autocuidado (÷ 7) − alimentação e higiene (${fmt(A.essentialsPerDay)} h/dia). Leitura e estudo extraclasse ficam dentro das horas de entrega.`;
 }
 
@@ -149,18 +158,18 @@ function graph4(rows) {
   const n = rows.length;
   if (mode4 === 'band') {
     const gs = BANDS.map(([, a, b]) => rows.filter(r => r.e.commuteMin > a && r.e.commuteMin <= b)), d = gs.map(g => shown(g) ? +mean(g.map(sw)).toFixed(2) : null);
-    mk('#g4', { type: 'bar', data: { labels: BANDS.map(([l], i) => `${l} de deslocamento (${nTxt(gs[i])})${d[i] == null ? '' : ' · ' + hm(d[i])}`), datasets: [{ label: 'sono possível no dia mais pesado', data: d, backgroundColor: d.map(v => v == null ? GREEN : sevColor(v)) }] },
-      options: { indexAxis: 'y', aspectRatio: small() ? 1.2 : 2.4, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` média: ${hm(c.parsed.x)} de sono possível no dia mais pesado` } } },
-        scales: { x: { min: Math.min(0, Math.floor(Math.min(...d.filter(v => v != null), 0))), ticks: { stepSize: 2 }, grid: lineGrid(6), title: { display: true, text: 'horas de sono possível no dia mais pesado (linha forte = 6 h)' } }, y: { grid: { display: false } } } } });
+    mk('#g4', { type: 'bar', data: { labels: BANDS.map(([l], i) => `${l}${shown(gs[i]) ? '' : '*'}`), datasets: [{ label: 'sono possível no dia mais pesado', data: d, backgroundColor: d.map(v => v == null ? GREEN : sevColor(v)) }] },
+      options: { indexAxis: 'y', aspectRatio: small() ? 1.2 : 2.4, layout: { padding: { right: 78 } }, plugins: { ...VL(hm), legend: { display: false }, tooltip: { callbacks: { label: c => ` média: ${hm(c.parsed.x)} de sono possível no dia mais pesado` } } },
+        scales: { x: { min: Math.min(0, Math.floor(Math.min(...d.filter(v => v != null), 0))), ticks: { stepSize: 2 }, grid: lineGrid(6), title: { display: true, text: T('horas de sono possível no dia mais pesado (linha forte = 6 h)', 'horas de sono no pior dia (linha = 6 h)') } }, y: { grid: { display: false } } } } });
     $('#lg4').innerHTML = '';
     const a = d[0], z = d[3];
-    $('#n4').textContent = `Média do sono possível no dia mais pesado por faixa de deslocamento diário (ida + volta). ${a != null && z != null ? `Quem se desloca mais de 3 h tem em média ${hm(a - z)} a menos que quem se desloca até 1 h. ` : ''}Faixas com menos de ${MIN_N} respostas ficam ocultas.`;
+    $('#n4').innerHTML = `${n} respostas válidas no total. Média do sono possível no dia mais pesado por faixa de deslocamento diário (ida + volta). ${a != null && z != null ? `Quem se desloca mais de 3 h tem em média ${hm(a - z)} a menos que quem se desloca até 1 h.` : ''}<br>* Faixas com poucas respostas não são exibidas, para preservar a privacidade.`;
   } else {
     const xs = rows.map(r => r.hrs), ys = rows.map(sw), reg = n >= 10 ? regress(xs, ys) : null;
     const ds = [{ label: 'estudante', data: rows.map(r => ({ x: +r.hrs.toFixed(2), y: +sw(r).toFixed(2), s: r.e.semester })), backgroundColor: rows.map(r => ramp(r.e.semester)), pointRadius: 5, pointHoverRadius: 8 }];
     if (reg) { const x0 = Math.min(...xs), x1 = Math.max(...xs); ds.push({ type: 'line', label: 'tendência', data: [{ x: x0, y: reg.intercept + reg.slope * x0 }, { x: x1, y: reg.intercept + reg.slope * x1 }], borderColor: css('--fg'), borderWidth: 2, borderDash: [6, 4], pointRadius: 0 }); }
     mk('#g4', { type: 'scatter', data: { datasets: ds }, options: { aspectRatio: small() ? 1.1 : 2, plugins: { legend: { display: false }, tooltip: { filter: i => i.datasetIndex === 0, callbacks: { label: c => ` ${c.raw.s}º período: ${hm(c.parsed.x)} de deslocamento por dia · ${hm(c.parsed.y)} de sono possível no dia mais pesado` } } },
-      scales: { x: { title: { display: true, text: 'deslocamento por dia, ida + volta (h)' } }, y: { ticks: { stepSize: 2 }, grid: lineGrid(6), title: { display: true, text: 'sono possível no dia mais pesado (h; linha forte = 6 h)' } } } } });
+      scales: { x: { title: { display: true, text: T('deslocamento por dia, ida + volta (h)', 'deslocamento por dia (h)') } }, y: { ticks: { stepSize: 2 }, grid: lineGrid(6), title: { display: true, text: T('sono possível no dia mais pesado (h; linha forte = 6 h)', 'sono no pior dia (h)') } } } } });
     $('#lg4').innerHTML = TERMS.map(t => `<span><i style="background:${ramp(t)}"></i>${t}º</span>`).join('') + '<span style="margin-left:8px">(cor = período do curso)</span>';
     const strength = r => Math.abs(r) < .2 ? 'fraca ou ausente' : Math.abs(r) < .5 ? 'moderada' : 'forte';
     $('#n4').textContent = reg ? `${reg.n} observações · correlação r = ${fmt(reg.r, 2)} (${strength(reg.r)}) · cada hora a mais de deslocamento por dia corresponde, em média, a ${fmt(Math.abs(reg.slope), 1)} h a menos de sono possível no dia mais pesado. Não indica causalidade.`
@@ -173,12 +182,12 @@ function graph4(rows) {
 function graph5(rows) {
   const by = byTermOf(rows), pc = (g, f) => shown(g) ? +(100 * g.filter(r => f(r) < 6).length / g.length).toFixed(0) : null;
   const dW = by.map(g => pc(g, sw)), dA = by.map(g => pc(g, r => r.w.sleepAvail));
-  mk('#g5', { type: 'bar', data: { labels: by.map((g, i) => `${i + 1}º (${nTxt(g)})`), datasets: [
+  mk('#g5', { type: 'bar', data: { labels: by.map(lab), datasets: [
       { label: 'no dia mais pesado', data: dW, backgroundColor: ALERT },
       { label: 'em uma noite média da semana', data: dA, backgroundColor: LIGHT_RED }] },
-    options: { indexAxis: 'y', aspectRatio: small() ? 0.9 : 1.5, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } }, tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${c.parsed.x}% dormem menos de 6 h` } } },
-      scales: { x: { min: 0, max: 100, title: { display: true, text: '% dos estudantes do período que podem dormir menos de 6 h' } }, y: { reverse: true, grid: { display: false } } } } });
-  $('#n5').textContent = `Vermelho forte: sono possível no dia mais pesado abaixo de 6 h. Vermelho claro: sono possível numa noite média da semana abaixo de 6 h, para comparação. Cada barra usa como denominador os estudantes válidos do período (n). Períodos com menos de ${MIN_N} respostas ficam ocultos.`;
+    options: { indexAxis: 'y', aspectRatio: small() ? 0.9 : 1.5, layout: { padding: { right: 48 } }, plugins: { ...VL(v => v + '%'), legend: { position: 'bottom', labels: { boxWidth: 12 } }, tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${c.parsed.x}% dormem menos de 6 h` } } },
+      scales: { x: { min: 0, max: 100, title: { display: true, text: T('% dos estudantes do período que podem dormir menos de 6 h', '% que podem dormir menos de 6 h') } }, y: { reverse: true, grid: { display: false } } } } });
+  $('#n5').innerHTML = `${rows.length} respostas válidas no total. Vermelho forte: sono possível no dia mais pesado abaixo de 6 h. Vermelho claro: sono possível numa noite média da semana abaixo de 6 h, para comparação. Cada barra usa como denominador os estudantes válidos do período.<br>${PRIV}`;
 }
 
 // ---------- rodapé metodológico ----------
