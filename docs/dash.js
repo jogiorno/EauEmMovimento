@@ -27,8 +27,8 @@ function render() {
   $('#headline').innerHTML = n ? `<b>${hm(avg(rows.map(r => r.w.sleepWorst)))}</b><span>de sono possível, em média, no dia mais pesado, depois de aulas, trabalho, estudo, casa, autocuidado e deslocamento.</span><small>Média de ${n} trajeto${n > 1 ? 's' : ''} completo${n > 1 ? 's' : ''}. Veja as premissas no fim da página.</small>` : '';
   $('#kpis').innerHTML = [
     [n ? fmt(avg(rows.map(r => r.w.sleepAvail))) + ' h' : '–', 'sono possível por noite (média)'],
-    [n ? fmt(100 * rows.filter(r => r.w.sleepWorst < 6).length / n, 0) + '%' : '–', 'podem dormir menos de 6 h no dia mais pesado'],
-    [n ? fmt(100 * rows.filter(r => r.w.sleepWorst < 4).length / n, 0) + '%' : '–', 'podem dormir menos de 4 h no dia mais pesado'],
+    [n ? fmt(100 * rows.filter(r => r.w.sleepWorst < 6).length / n, 0) + '%' : '–', 'podem dormir <strong>menos de 6 h</strong> no dia mais pesado', 1],
+    [n ? fmt(100 * rows.filter(r => r.w.sleepWorst < 4).length / n, 0) + '%' : '–', 'podem dormir <strong>menos de 4 h</strong> no dia mais pesado', 1],
     [n ? fmt(avg(rows.map(r => r.w.sleepWorst))) + ' h' : '–', 'sono possível no dia mais pesado (média)'],
     [n ? fmt(avg(rows.map(r => r.e.classWeekMin / 60))) + ' h' : '–', 'horas de aula por semana (média)'],
     [n ? fmt(avg(rows.map(r => r.e.classMaxDayMin / 60))) + ' h' : '–', 'maior dia de aula (média)'],
@@ -39,7 +39,7 @@ function render() {
     [fmt(weekCommute) + ' h', 'deslocamento por semana'],
     [fmt(weekCommute * 18, 0) + ' h', 'deslocamento por semestre (≈18 sem.)'],
     [n ? fmt(100 * neg / n, 0) + '%' : '–', 'com semana que não fecha (tempo livre < 0)'],
-  ].map(([b, s]) => `<div class="card kpi"><b>${b}</b><span>${s}</span></div>`).join('');
+  ].map(([b, s, alert]) => `<div class="card kpi${alert ? ' alert' : ''}"><b>${b}</b><span>${s}</span></div>`).join('');
 
   const byTerm = Array.from({ length: 10 }, (_, i) => rows.filter(r => r.e.semester === i + 1));
   mk('#c1', { type: 'bar', data: { labels: byTerm.map((_, i) => (i + 1) + 'º'),
