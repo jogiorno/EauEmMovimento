@@ -123,10 +123,10 @@ function graph2(rows) {
   const below = f => fmt(100 * rows.filter(f).length / n, 0) + '%';
   $('#st2').innerHTML = (ok ? [
     [hm(self), 'autocuidado por semana (média informada)'], [hm(R.selfcareH), 'referência de autocuidado (OMS, só exercício)'],
-    [below(r => r.w.selfcare < R.selfcareH), 'abaixo da referência de autocuidado'],
+    [below(r => r.w.selfcare < R.selfcareH), 'abaixo da referência de autocuidado', 1],
     [hm(read), 'leitura por semana (média informada)'], [hm(read + study), 'leitura + estudo extraclasse (média informada)'], [hm(refS), 'referência de leitura + estudo (40 h de carga total − aulas)'],
-    [below(r => r.w.reading + r.w.study < refStudy(r.w)), 'abaixo da referência de leitura + estudo']] : [])
-    .map(([b, s]) => `<div><b>${b}</b><span>${s}</span></div>`).join('');
+    [below(r => r.w.reading + r.w.study < refStudy(r.w)), 'abaixo da referência de leitura + estudo', 1]] : [])
+    .map(([b, s, al]) => `<div${al ? ' class="alert"' : ''}><b>${b}</b><span>${s}</span></div>`).join('');
   $('#n2').textContent = ok ? `Média de ${n} respostas válidas no total. As fatias de autocuidado e leitura estão destacadas; as referências são pisos mínimos, não metas de excelência. Os percentuais comparam cada estudante com a própria referência (a de leitura + estudo depende das horas de aula dele). Veja abaixo de onde vêm os números.` : `Poucas respostas válidas: resultado oculto para preservar a privacidade.`;
   $('#p2').innerHTML = REF_HTML;
 }
