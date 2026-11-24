@@ -14,6 +14,7 @@ html,body{height:100%}body{display:flex;flex-direction:column;height:100vh;heigh
 .dot{width:12px;height:12px;border-radius:50%;flex:none}
 .stat{position:absolute;z-index:1000;bottom:24px;right:24px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 20px;font-size:13px}
 .stat b{font-size:20px;color:var(--acc)}
+.stat select{margin-left:8px;padding:4px 8px;min-height:0;font-size:12px}
 #msg{min-height:18px;font-size:13px;color:var(--acc)}
 .hd{display:flex;align-items:center;justify-content:space-between;gap:12px}.hd h2{margin:0 0 10px}
 #toggle{display:none;min-height:0;padding:4px 12px}
@@ -35,7 +36,7 @@ html,body{height:100%}body{display:flex;flex-direction:column;height:100vh;heigh
 <div id="wrap"><div id="map"></div>
 <div id="panel">
   <div class="hd"><h2>Desenhe o seu trajeto</h2><button id="toggle" type="button" aria-label="Recolher ou expandir painel">▾</button></div>
-  <p>Cada linha reta liga a moradia de um estudante à Escola de Arquitetura e Urbanismo. Juntas, formam o emaranhado.</p>
+  <p>Cada linha reta liga a moradia de um estudante à Escola de Arquitetura e Urbanismo. Juntas, formam o emaranhado. A linha mostra a distância em linha reta até a EAU, não o percurso real.</p>
   <div class="step"><span class="dot" style="background:#5fd4e6"></span><span id="s1">1. Clique no mapa: <b>moradia</b></span></div>
   <div class="row"><button id="reset" type="button">Recomeçar</button></div>
   <input id="q" placeholder="Buscar endereço ou bairro…" style="width:100%;margin-top:22px"><div id="results"></div>
@@ -59,12 +60,12 @@ html,body{height:100%}body{display:flex;flex-direction:column;height:100vh;heigh
     <input name="studyMin" data-h type="number" min="0" max="80" step="0.5" required placeholder="ex.: 15">
     <label>Autocuidado por semana: terapia, exercício físico, consultas, exames etc. (horas)</label>
     <input name="selfcareMin" data-h type="number" min="0" max="80" step="0.5" required placeholder="ex.: 4">
-    <p>Por privacidade, as coordenadas são arredondadas (~10 m) e nenhum nome é guardado. Use um ponto próximo, não necessariamente a porta de casa.</p>
+    <p>Por privacidade, as coordenadas são arredondadas (~100 m) e nenhum nome é guardado. Use um ponto próximo, não necessariamente a porta de casa.</p>
     <button class="pri" style="width:100%;margin-top:18px" id="send">Enviar trajeto</button>
   </form>
   <div id="msg"></div>
 </div>
-<div class="stat"><b id="n">0</b> trajetos</div></div>
+<div class="stat"><b id="n">0</b> trajetos <select id="per" aria-label="Filtrar por período do curso"></select></div></div>
 <footer class="aviso">Este site não pretende fazer um levantamento definitivo, e sim chamar atenção para a exaustão dos estudantes de arquitetura e urbanismo. Entendemos que os dados aqui coletados podem não ser exatamente um retrato fiel da realidade.</footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script src="config.js"></script><script src="db.js"></script><script src="model.js"></script><script src="app.js"></script>

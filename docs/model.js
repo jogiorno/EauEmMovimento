@@ -34,5 +34,43 @@ window.Model = (() => {
     return { sleepAvail, sleepWorst, commute, class: cls, intern: work, domestic: dom, reading: read, study, selfcare: self, sleep, essentials: ess, free: 168 - used };
   }
 
-  return { UFF, DEFAULTS, FIELDS, straightKm, complete, week };
+  // Categorias da semana (ordem de empilhamento), cor e tipo de tempo.
+  const CATS = [
+    ['class', 'Aulas', '#ffc857', 'institucional'],
+    ['intern', 'Trabalho/estágio', '#ff9f5a', 'produtivo'],
+    ['study', 'Estudo extraclasse', '#c792ea', 'produtivo'],
+    ['reading', 'Leitura', '#7ddc8b', 'produtivo'],
+    ['essentials', 'Alimentação e higiene', '#8d98a8', 'reprodutivo'],
+    ['domestic', 'Trabalho doméstico', '#b08968', 'reprodutivo'],
+    ['commute', 'Deslocamento', '#ff5c7a', 'reprodutivo'],
+    ['selfcare', 'Autocuidado', '#4fb0ae', 'recuperacao'],
+    ['sleep', 'Sono (referência)', '#6c7ae0', 'recuperacao'],
+    ['free', 'Tempo livre', '#5fd4e6', 'recuperacao'],
+  ];
+  const GROUPS = [['institucional', 'Institucional', '#ffc857'], ['produtivo', 'Produtivo', '#c792ea'],
+    ['reprodutivo', 'Reprodutivo', '#ff5c7a'], ['recuperacao', 'Recuperação', '#5fd4e6']];
+  const GROUP_NOTE = 'Institucional: aulas. Produtivo: trabalho/estágio, estudo extraclasse e leitura. Reprodutivo: alimentação e higiene, trabalho doméstico e deslocamento. Recuperação: sono (de referência), tempo livre e autocuidado.';
+
+  // Divide as 168 h em: informado pelo estudante, presumido pelo site e o que sobra para dormir.
+  // Atenção: o deslocamento semanal usa "dias na EAU", que é premissa (minutos informados × dias).
+  function split(w, a) {
+    const declared = w.commute + w.class + w.intern + w.domestic + w.reading + w.study + w.selfcare;
+    const presumed = w.essentials + a.freeMin;
+    return { declared, presumed, residual: 168 - declared - presumed }; // residual = sono possível por semana (7 × sleepAvail)
+  }
+
+  // Premissas editáveis (compartilhadas entre Dados e Meu trajeto).
+  const ASSUMP_KEY = 'eau-assump-v4';
+  function loadAssump() {
+    const A = JSON.parse(JSON.stringify(DEFAULTS));
+    try { Object.assign(A, JSON.parse(localStorage.getItem(ASSUMP_KEY) || '{}')); } catch {}
+    return A;
+  }
+  const saveAssump = A => { try { localStorage.setItem(ASSUMP_KEY, JSON.stringify(A)); } catch {} };
+
+  const hm = h => { const m = Math.round(Math.abs(h) * 60), a = Math.floor(m / 60), b = m % 60;
+    return (h < 0 && m ? '−' : '') + (a ? a + ' h' + (b ? ' ' + b + ' min' : '') : b + ' min'); }; // 5.2 → "5 h 12 min"
+  const fractionBelow = (vals, x) => vals.length ? vals.filter(v => v < x).length / vals.length : 0;
+
+  return { UFF, DEFAULTS, FIELDS, CATS, GROUPS, GROUP_NOTE, straightKm, complete, week, split, loadAssump, saveAssump, hm, fractionBelow };
 })();
