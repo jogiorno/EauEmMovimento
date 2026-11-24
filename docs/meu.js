@@ -47,6 +47,6 @@ else {
   const U = [UFF.lat, UFF.lng];
   L.polyline([e.home, U], { color: '#d6001c', weight: 4 }).addTo(map);
   L.circleMarker(e.home, { radius: 7, color: '#000', weight: 1, fillColor: '#5fd4e6', fillOpacity: 1 }).bindTooltip('Moradia').addTo(map);
-  L.circleMarker(U, { radius: 9, color: '#fff', weight: 2, fillColor: '#d6001c', fillOpacity: 1 }).bindTooltip('EAU').addTo(map);
+  L.circleMarker(U, { radius: 9, stroke: false, fillColor: '#e60023', fillOpacity: 1 }).bindTooltip('EAU').addTo(map);
   map.fitBounds([e.home, U], { padding: [40, 40] });
 }

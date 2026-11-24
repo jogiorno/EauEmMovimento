@@ -17,10 +17,10 @@ const lines = L.layerGroup().addTo(map);
 // Sobreposições clareiam via mix-blend-mode.
 const redShade = seed => {
   let h = 0; for (const c of String(seed)) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-  const hue = (350 + (h % 30)) % 360, light = 42 + ((h >> 5) % 24), sat = 85 + ((h >> 11) % 16);
+  const hue = (354 + (h % 14)) % 360, light = 40 + ((h >> 5) % 16), sat = 100;
   return `hsl(${hue},${sat}%,${light}%)`;
 };
-L.circleMarker([UFF.lat, UFF.lng], { radius: 9, color: '#fff', weight: 2, fillColor: '#ff3d71', fillOpacity: 1 })
+L.circleMarker([UFF.lat, UFF.lng], { radius: 9, stroke: false, fillColor: '#e60023', fillOpacity: 1 })
   .bindTooltip(UFF.name, { permanent: false }).addTo(map);
 
 $('#toggle').onclick = () => $('#panel').classList.toggle('collapsed');
@@ -35,7 +35,7 @@ for (let i = 1; i <= 10; i++) f.semester.add(new Option(i + 'º período', i));
 DB.list().then(es => {
   $('#n').textContent = es.length;
   for (const e of es)
-    L.polyline([e.home, [UFF.lat, UFF.lng]], { color: redShade(e.id), weight: 2, opacity: 0.65, interactive: false }).addTo(lines);
+    L.polyline([e.home, [UFF.lat, UFF.lng]], { color: redShade(e.id), weight: 2.4, opacity: 0.85, interactive: false }).addTo(lines);
 }).catch(e => msg(e.message));
 
 let home = null, marker = null;
