@@ -6,6 +6,7 @@ const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).
 const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0;
 const fmt = (n, d = 1) => n.toLocaleString('pt-BR', { maximumFractionDigits: d });
 let entries = [], charts = {};
+const hm = h => { const m = Math.round(Math.abs(h) * 60), a = Math.floor(m / 60), b = m % 60; return (h < 0 && m ? '−' : '') + (a ? a + ' h' + (b ? ' ' + b + ' min' : '') : b + ' min'); };
 
 const CATS = [['sleep', 'Sono', '#6c7ae0'], ['essentials', 'Atividades essenciais', '#8d98a8'], ['class', 'Aulas', '#ffc857'],
   ['intern', 'Trabalho/estágio', '#ff9f5a'], ['domestic', 'Trabalho doméstico', '#b08968'], ['reading', 'Leitura', '#7ddc8b'], ['study', 'Estudo extraclasse', '#c792ea'], ['selfcare', 'Autocuidado', '#4fb0ae'], ['commute', 'Deslocamento', '#ff5c7a'], ['free', 'Tempo livre', '#5fd4e6']];
@@ -23,6 +24,7 @@ function render() {
   const n = rows.length;
   const weekCommute = avg(rows.map(r => r.w.commute));
   const neg = rows.filter(r => r.w.free < 0).length;
+  $('#headline').innerHTML = n ? `<b>${hm(avg(rows.map(r => r.w.sleepWorst)))}</b><span>de sono possível, em média, no dia mais pesado, depois de aulas, trabalho, estudo, casa, autocuidado e deslocamento.</span><small>Média de ${n} trajeto${n > 1 ? 's' : ''} completo${n > 1 ? 's' : ''}. Veja as premissas no fim da página.</small>` : '';
   $('#kpis').innerHTML = [
     [n ? fmt(avg(rows.map(r => r.w.sleepAvail))) + ' h' : '–', 'sono possível por noite (média)'],
     [n ? fmt(100 * rows.filter(r => r.w.sleepWorst < 6).length / n, 0) + '%' : '–', 'podem dormir menos de 6 h no dia mais pesado'],
