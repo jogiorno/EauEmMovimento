@@ -114,7 +114,7 @@ f.onsubmit = async ev => {
     L.polyline([H, U], { color: redShade(Math.random()), weight: 4, opacity: 1, interactive: false }).addTo(tangle);
     $('#n').textContent = +$('#n').textContent + 1;
     const w = Model.week(body, Model.DEFAULTS);
-    msg(`Enviado! ${body.distKm.toFixed(1)} km em linha reta. Na semana média sobram ~${w.sleepAvail.toFixed(1)} h de sono por noite; no dia mais pesado, ~${w.sleepWorst.toFixed(1)} h. Veja o dashboard.`);
+    msg(`Enviado! ${body.distKm.toFixed(1)} km em linha reta. Na semana média sobram ~${w.sleepAvail.toFixed(1)} h de sono por noite; no dia mais pesado, ~${w.sleepWorst.toFixed(1)} h. Veja a aba Dados.`);
     f.reset(); f.querySelectorAll('small').forEach(x => x.textContent = ''); clear(); refresh(); lock();
   } catch (e) { msg('Erro: ' + e.message); }
   $('#send').disabled = false;
