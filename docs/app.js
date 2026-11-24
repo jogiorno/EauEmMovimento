@@ -8,7 +8,6 @@ const esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/C
   { attribution: 'Tiles © Esri', maxZoom: 16, opacity: 0.7 });
 osm.addTo(map);
 L.control.zoom({ position: 'topright' }).addTo(map);
-L.control.layers({ 'OSM (escuro)': osm, 'Esri cinza escuro': esri }, null, { position: matchMedia('(max-width:720px)').matches ? 'topright' : 'bottomleft' }).addTo(map);
 // se o OSM falhar repetidamente, troca sozinho para Esri
 let tileErrors = 0;
 osm.on('tileerror', () => { if (++tileErrors === 6 && map.hasLayer(osm)) { map.removeLayer(osm); esri.addTo(map); } });
