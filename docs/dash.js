@@ -41,7 +41,7 @@ function render() {
   const rows = good.map(e => ({ e, w: week(e, A), hrs: e.commuteMin / 60 }));
   const n = rows.length;
   const weekCommute = avg(rows.map(r => r.w.commute));
-  $('#headline').innerHTML = n ? `<b>${hm(avg(rows.map(r => r.w.sleepWorst)))}</b><span>de sono possível, em média, no dia mais pesado, depois de aulas, trabalho, estudo, casa, autocuidado e deslocamento.</span><small>Média de ${n} trajeto${n > 1 ? 's' : ''} válido${n > 1 ? 's' : ''}. Veja as premissas no fim da página.</small>` : '';
+  $('#headline').innerHTML = n ? `<b>${hm(avg(rows.map(r => r.w.sleepWorst)))}</b><span>de sono possível, em média, no dia mais pesado, depois de aulas, trabalho, estudo, casa, autocuidado e deslocamento.</span><small>Média de ${n} trajeto${n > 1 ? 's' : ''} válido${n > 1 ? 's' : ''}. Veja as premissas no fim da página.</small><em class="hint">Clique para ver o que a falta de sono causa na saúde →</em>` : '';
   $('#kpis').innerHTML = [
     [n ? hm(avg(rows.map(r => r.w.sleepAvail))) : '–', 'sono possível por noite (média)'],
     [n ? fmt(100 * rows.filter(r => r.w.sleepWorst < 6).length / n, 0) + '%' : '–', 'podem dormir <strong>menos de 6 h</strong> no dia mais pesado', 1],
@@ -207,3 +207,13 @@ buildAssump();
 const seg = (sel, set, draw) => document.querySelectorAll(sel + ' button').forEach(b => b.onclick = () => { set(b.dataset.m); document.querySelectorAll(sel + ' button').forEach(x => x.classList.toggle('on', x === b)); draw(lastRows); });
 seg('#seg1', m => mode1 = m, graph1); seg('#seg4', m => mode4 = m, graph4);
 DB.list().then(es => { entries = es; render(); }).catch(e => { $('#kpis').innerHTML = `<div class="card">${e.message}</div>`; });
+
+// Página "O que a falta de sono faz": abre ao clicar no número grande (ou em #efeitos na URL), fecha com o botão ou Esc.
+const ef = $('#efeitos');
+const openEf = () => { ef.hidden = false; ef.scrollTop = 0; if (document.body) document.body.style.overflow = 'hidden'; try { history.replaceState(null, '', '#efeitos'); } catch {} $('#efClose').focus(); };
+const closeEf = () => { ef.hidden = true; if (document.body) document.body.style.overflow = ''; try { history.replaceState(null, '', location.pathname + location.search); } catch {} $('#headline').focus(); };
+$('#headline').onclick = openEf;
+$('#headline').onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openEf(); } };
+$('#efClose').onclick = closeEf;
+document.onkeydown = e => { if (e.key === 'Escape' && !ef.hidden) closeEf(); };
+if (typeof location !== 'undefined' && location.hash === '#efeitos') openEf();

@@ -27,6 +27,15 @@ h2.sec{font-family:Manrope,system-ui,sans-serif;font-size:28px;margin:72px 0 6px
 .lg{display:flex;flex-wrap:wrap;gap:6px 14px;margin:12px 0 0;font-size:12px;color:var(--mute)}.lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px}
 .smg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}.sm{padding:16px 18px}.sm h4{margin:0 0 8px;font-family:Manrope,system-ui,sans-serif;font-size:16px}.sm small{font-weight:400;color:var(--mute);font-size:12px}
 .method{font-size:13px;line-height:1.8;color:var(--mute);max-width:90ch}.method h3{color:var(--fg);margin:28px 0 8px;font-size:15px}.method li{margin:4px 0}.method strong{color:var(--fg)}
+.big[role=button]{cursor:pointer;transition:filter .15s}.big[role=button]:hover{filter:brightness(1.08)}.big[role=button]:focus-visible{outline:3px solid var(--fg);outline-offset:3px}
+.big .hint{display:block;margin-top:20px;font-style:normal;font-weight:700;font-size:15px;text-decoration:underline;text-underline-offset:4px}
+.overlay{position:fixed;inset:0;z-index:1000;background:var(--bg);overflow:auto}.overlay[hidden]{display:none}
+.ov-bar{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);padding:12px 24px}
+.ov-body{max-width:760px;margin:0 auto;padding:40px 24px 96px}.ov-body h1{font-size:clamp(30px,5vw,48px);line-height:1.15;margin:0 0 20px}
+.ov-body h2{font-size:24px;margin:44px 0 4px;padding-top:12px;border-top:2px solid var(--acc)}.ov-body h2 small{display:block;font-family:'Geist Mono',monospace;font-weight:400;font-size:13px;color:var(--mute);margin-top:4px}
+.ov-body p,.ov-body li{font-size:15px;line-height:1.8}.ov-body li{margin:8px 0}.ov-body .lead{font-size:16px}
+.ov-body .care{border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin:24px 0;color:var(--mute);font-size:14px}
+.ov-body .src li{font-size:13px;color:var(--mute)}.ov-body a{color:var(--acc)}
 .note{color:var(--mute);font-size:13px;line-height:1.8}.about{margin:0 0 40px;max-width:90ch}.about h3{margin:0 0 10px;font-size:15px;letter-spacing:.04em}.about h3:not(:first-child){margin-top:28px}.about p{margin:0 0 12px;color:var(--mute);font-size:14px;line-height:1.8}.about strong{color:var(--fg)}.warn{border-left:3px solid var(--acc);padding-left:20px;margin:0 0 40px}
 @media (max-width:720px){
   main{padding:24px 16px 56px}
@@ -42,7 +51,7 @@ h2.sec{font-family:Manrope,system-ui,sans-serif;font-size:28px;margin:72px 0 6px
 <nav><img src="logo.png" alt=""><b>EAU EM MOVIMENTO</b><a href="index.html">Mapa</a><a class="on" href="dashboard.html">Dados</a><a href="meu-trajeto.html">Meu trajeto</a><span class="sp"></span><small>Arquitetura e Urbanismo · UFF Praia Vermelha</small></nav>
 <main>
 <div class="hero"><div><h1>Quanto sobra para dormir?</h1><p>Somamos aulas, trabalho/estágio, trabalho doméstico, leitura, estudo, autocuidado, atividades essenciais e o tempo de deslocamento informados por cada estudante. O que restar, depois de preservar algum tempo livre, é o sono possível.</p></div></div>
-<div class="big" id="headline"></div>
+<div class="big" id="headline" role="button" tabindex="0" aria-label="Abrir: o que a falta de sono causa na saúde"></div>
 <section class="about">
 <h3>COMO CALCULAMOS?</h3>
 <p>Cada estudante informa as atividades realizadas no semestre em curso: deslocamento (em minutos) e aulas, trabalho e estágio, trabalho doméstico, leitura, estudos extraclasse e autocuidado (em horas).</p>
@@ -116,6 +125,52 @@ h2.sec{font-family:Manrope,system-ui,sans-serif;font-size:28px;margin:72px 0 6px
   <li>Para preservar o anonimato, resultados agregados de períodos com poucas respostas (menos de 3) não são exibidos e aparecem marcados com *; os pontos individuais não carregam identificação.</li></ul>
 </div>
 </main>
+<div class="overlay" id="efeitos" role="dialog" aria-modal="true" aria-labelledby="efTitle" hidden>
+<div class="ov-bar"><button type="button" id="efClose">← Voltar aos dados</button></div>
+<article class="ov-body">
+<h1 id="efTitle">O que a falta de sono faz com o corpo e a mente</h1>
+<p class="lead">O número grande da página Dados é o <strong>sono possível no dia mais pesado</strong>: o que sobra depois de aulas, trabalho, estudo, casa, autocuidado e deslocamento. Adultos precisam, em geral, de <strong>7 horas ou mais</strong> de sono por noite, segundo o <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4434546/" target="_blank" rel="noopener">consenso da Academia Americana de Medicina do Sono e da Sociedade de Pesquisa do Sono (2015)</a>. Abaixo, o que a pesquisa científica associa a dormir menos do que isso.</p>
+<div class="care"><strong>Leia com cuidado.</strong> É informação geral, não diagnóstico. Boa parte dos estudos é observacional: mostra associação, não prova que a falta de sono sozinha causa cada problema. E o número deste site é sono <em>possível</em> estimado, não o sono que cada pessoa dorme de fato. Um dia pesado isolado também não é o mesmo que privação crônica.</div>
+
+<h2>A curto prazo<small>uma noite ou poucos dias</small></h2>
+<ul>
+<li><strong>Atenção, memória e reação pioram.</strong> Em um estudo, ficar de 17 a 19 horas acordado levou a desempenho, em alguns testes, igual ou pior que o de quem tinha 0,05% de álcool no sangue; depois de mais tempo acordado, o nível chegou ao equivalente a 0,1% (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC1739867" target="_blank" rel="noopener">Williamson e Feyer, 2000</a>).</li>
+<li><strong>Mais erros e mais risco de acidentes.</strong> O consenso de 2015 lista desempenho prejudicado, mais erros e maior risco de acidentes entre as consequências de dormir pouco, como ao dirigir ou operar equipamentos.</li>
+</ul>
+
+<h2>A médio prazo<small>semanas dormindo pouco</small></h2>
+<ul>
+<li><strong>O prejuízo se acumula, e a gente não percebe.</strong> Em um experimento, dormir 6 horas por noite durante 14 dias levou a déficits de desempenho cognitivo equivalentes a até duas noites inteiras sem dormir. Os participantes quase não percebiam o próprio declínio (<a href="https://pubmed.ncbi.nlm.nih.gov/12683469/" target="_blank" rel="noopener">Van Dongen e colaboradores, 2003</a>). A sensação de "já me acostumei" engana.</li>
+<li><strong>Mais estresse.</strong> Uma revisão de 34 estudos com universitários encontrou associação moderada entre sono ruim ou insônia e estresse (<a href="https://pubmed.ncbi.nlm.nih.gov/34922108/" target="_blank" rel="noopener">revisão de 2022</a>), com muita variação entre os estudos.</li>
+<li><strong>Humor e imunidade.</strong> O consenso de 2015 associa dormir menos de 7 horas regularmente a depressão, mais dor e menor função imunológica. O <a href="https://www.cdc.gov/heart-disease/about/sleep-and-heart-health.html" target="_blank" rel="noopener">CDC</a> também relata mais depressão entre adultos que dormem menos de 7 horas.</li>
+</ul>
+
+<h2>A longo prazo<small>meses e anos de sono regular abaixo de 7 horas</small></h2>
+<ul>
+<li><strong>Doenças crônicas.</strong> O consenso de 2015 associa dormir menos de 7 horas regularmente a ganho de peso e obesidade, diabetes, hipertensão, doença cardíaca, AVC e maior risco de morte. O CDC acrescenta que problemas de sono mantêm a pressão arterial alta por mais tempo.</li>
+<li><strong>Coração.</strong> Uma meta-análise de 15 estudos com cerca de 475 mil pessoas encontrou, entre quem dorme pouco, risco 48% maior de desenvolver ou morrer de doença coronariana, e 15% maior de AVC (resultado no limite da significância estatística). O risco cardiovascular total não teve diferença significativa (<a href="https://pubmed.ncbi.nlm.nih.gov/21300732/" target="_blank" rel="noopener">Cappuccio e colaboradores, 2011</a>).</li>
+<li><strong>Mortalidade.</strong> Outra meta-análise, de 16 estudos e cerca de 1,4 milhão de pessoas, encontrou 12% mais risco de morte por qualquer causa entre quem dorme pouco (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2864873/" target="_blank" rel="noopener">Cappuccio e colaboradores, 2010</a>). Esses estudos acompanham pessoas por anos e observam associações; outros fatores de vida podem pesar nos resultados.</li>
+</ul>
+
+<h2>O que isto não quer dizer</h2>
+<ul>
+<li>Não quer dizer que todo estudante com dia pesado vai adoecer. Os estudos falam de grupos e de médias, não de uma pessoa.</li>
+<li>Não substitui avaliação de saúde. Se a falta de sono está afetando sua saúde, procure atendimento de saúde ou o serviço de apoio ao estudante da sua instituição.</li>
+<li>O ponto deste site é tornar visível quanto tempo a rotina de formação deixa para dormir, e o motivo de isso importar.</li>
+</ul>
+
+<h2>Fontes</h2>
+<ul class="src">
+<li>Watson e colaboradores, 2015. Consenso da AASM e da SRS sobre a quantidade recomendada de sono para adultos. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4434546/" target="_blank" rel="noopener">PMC4434546</a></li>
+<li>Williamson e Feyer, 2000. Occupational and Environmental Medicine. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC1739867" target="_blank" rel="noopener">PMC1739867</a></li>
+<li>Van Dongen e colaboradores, 2003. Sleep 26(2). <a href="https://pubmed.ncbi.nlm.nih.gov/12683469/" target="_blank" rel="noopener">PubMed 12683469</a></li>
+<li>Cappuccio e colaboradores, 2010. Sleep. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2864873/" target="_blank" rel="noopener">PMC2864873</a></li>
+<li>Cappuccio e colaboradores, 2011. European Heart Journal. <a href="https://pubmed.ncbi.nlm.nih.gov/21300732/" target="_blank" rel="noopener">PubMed 21300732</a></li>
+<li>Revisão sobre sono, insônia e estresse em universitários, 2022. <a href="https://pubmed.ncbi.nlm.nih.gov/34922108/" target="_blank" rel="noopener">PubMed 34922108</a></li>
+<li>CDC, Sono e saúde do coração. <a href="https://www.cdc.gov/heart-disease/about/sleep-and-heart-health.html" target="_blank" rel="noopener">cdc.gov</a></li>
+</ul>
+</article>
+</div>
 <footer class="aviso">Este site não pretende fazer um levantamento definitivo, e sim chamar atenção para a exaustão dos estudantes de arquitetura e urbanismo. Entendemos que os dados aqui coletados podem não ser exatamente um retrato fiel da realidade.</footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="config.js"></script><script src="db.js"></script><script src="model.js"></script><script src="dash.js"></script>
