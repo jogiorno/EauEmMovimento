@@ -32,19 +32,11 @@ f.querySelectorAll('input[data-min]').forEach(i => { const s = document.createEl
   i.after(s); i.oninput = () => s.textContent = i.value !== '' && +i.value >= 0 ? '= ' + hh(+i.value) : ''; });
 for (let i = 1; i <= 10; i++) f.semester.add(new Option(i + 'º período', i));
 
-let all = [];
-const per = $('#per');
-per.add(new Option('Todos os períodos', ''));
-for (let i = 1; i <= 10; i++) per.add(new Option(i + 'º período', i));
-function draw() {
-  tangle.clearLayers();
-  const es = all.filter(e => !per.value || e.semester === +per.value);
+DB.list().then(es => {
   $('#n').textContent = es.length;
   for (const e of es)
     L.polyline([e.home, [UFF.lat, UFF.lng]], { color: redShade(e.id), weight: 2, opacity: 0.65, interactive: false }).addTo(tangle);
-}
-per.onchange = draw;
-DB.list().then(es => { all = es; draw(); }).catch(e => msg(e.message));
+}).catch(e => msg(e.message));
 
 let home = null, marker = null;
 // Um trajeto por dispositivo: o envio fica guardado no navegador (página "Meu trajeto") e trava novos envios.
@@ -105,8 +97,7 @@ $('#q').oninput = ev => {
   }, 600);
 };
 
-// ~100 m: menos preciso de propósito, para não expor a porta de casa de ninguém.
-const round = p => p.map(v => +v.toFixed(3));
+const round = p => p.map(v => +v.toFixed(4));
 
 f.onsubmit = async ev => {
   ev.preventDefault();
@@ -120,8 +111,8 @@ f.onsubmit = async ev => {
     for (const k of Model.FIELDS) body[k] = k === 'commuteMin' ? num(k) : Math.round(num(k) * 60);
     await DB.add(body);
     try { localStorage.setItem(KEY, JSON.stringify({ body, at: Date.now() })); } catch {}
-    all.push({ id: Math.random(), home: H, semester: body.semester }); draw();
-    L.polyline([H, U], { color: '#ff3d71', weight: 4, opacity: 1, interactive: false }).addTo(tangle);
+    L.polyline([H, U], { color: redShade(Math.random()), weight: 4, opacity: 1, interactive: false }).addTo(tangle);
+    $('#n').textContent = +$('#n').textContent + 1;
     const w = Model.week(body, Model.DEFAULTS);
     msg(`Enviado! ${body.distKm.toFixed(1)} km em linha reta. Na semana média sobram ~${w.sleepAvail.toFixed(1)} h de sono por noite; no dia mais pesado, ~${w.sleepWorst.toFixed(1)} h. Veja a aba Dados.`);
     f.reset(); f.querySelectorAll('small').forEach(x => x.textContent = ''); clear(); refresh(); lock();

@@ -15,15 +15,6 @@ h1{margin:0 0 12px;font-size:32px}h3{margin:0 0 20px;font-size:17px}canvas{max-h
 .lead{color:var(--mute);max-width:64ch;margin:0 0 40px}
 #map{height:300px;border-radius:8px;background:#e8eaed}
 table{width:100%;border-collapse:collapse;font-size:13px}td{padding:6px 0;border-bottom:1px solid var(--line)}td:last-child{text-align:right;color:var(--fg)}
-.cells{display:grid;grid-template-columns:repeat(24,1fr);gap:2px}.cells i{aspect-ratio:1;border-radius:2px}
-.leg{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px 18px;margin:16px 0 0;padding:0;list-style:none;font-size:12px}
-.leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:8px}.leg b{float:right;font-weight:500}
-.note{color:var(--mute);font-size:12px;line-height:1.7;margin:14px 0 0}.alert{color:var(--acc);font-weight:600}
-.sim{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px 32px}.sim label{margin:0 0 4px;display:flex;justify-content:space-between}
-.sim input[type=range]{width:100%;padding:0;min-height:0;border:0;background:none;accent-color:var(--acc)}
-.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:24px}.res div{border:1px solid var(--line);border-radius:8px;padding:14px 16px}
-.res b{display:block;font-size:22px;font-family:Manrope,system-ui,sans-serif}.res span{font-size:12px;color:var(--mute)}
-#cmp{margin:24px 0 0;font-size:15px;max-width:75ch}
 .empty{max-width:60ch}.empty a{color:var(--acc)}
 @media (max-width:720px){
   main{padding:24px 16px 40px}h1{font-size:24px}
@@ -38,21 +29,15 @@ table{width:100%;border-collapse:collapse;font-size:13px}td{padding:6px 0;border
   <div id="mine" hidden>
     <p class="lead">Estas são só as informações que você enviou, guardadas neste dispositivo. Elas não aparecem para ninguém separadamente: no mapa e nos dados, entram junto com as dos demais estudantes.</p>
     <div class="kpis" id="kpis"></div>
-    <p id="cmp" hidden></p>
     <div class="grid">
-      <div class="card"><h3>Sua semana: 168 horas, uma célula por hora</h3><div class="cells" id="cells"></div><ul class="leg" id="leg"></ul><p class="note" id="over"></p><p class="note" id="split"></p></div>
+      <div class="card"><h3>Sua semana (168 h)</h3><canvas id="c1"></canvas></div>
       <div class="card"><h3>Sua moradia e a EAU</h3><div id="map"></div></div>
-      <div class="card" style="grid-column:1/-1"><h3>E se…? Simule outra semana</h3>
-        <p class="note" style="margin:0 0 18px">Mexa nos controles para ver como o sono e o tempo livre mudariam. É só uma simulação: nada é enviado nem alterado no seu trajeto.</p>
-        <div class="sim" id="sim"></div>
-        <div class="res" id="res"></div>
-        <button type="button" id="simReset" style="margin-top:18px">Voltar aos meus valores</button>
-      </div>
       <div class="card" style="grid-column:1/-1"><h3>O que você informou</h3><table id="tbl"></table></div>
     </div>
   </div>
 </main>
 <footer class="aviso">Este site não pretende fazer um levantamento definitivo, e sim chamar atenção para a exaustão dos estudantes de arquitetura e urbanismo. Entendemos que os dados aqui coletados podem não ser exatamente um retrato fiel da realidade.</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
-<script src="config.js"></script><script src="db.js"></script><script src="model.js"></script><script src="meu.js"></script>
+<script src="model.js"></script><script src="meu.js"></script>
 </body></html>
