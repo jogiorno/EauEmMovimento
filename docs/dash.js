@@ -25,8 +25,8 @@ function render() {
   const neg = rows.filter(r => r.w.free < 0).length;
   $('#kpis').innerHTML = [
     [n ? fmt(avg(rows.map(r => r.w.sleepAvail))) + ' h' : '–', 'sono possível por noite (média)'],
-    [n ? fmt(100 * rows.filter(r => r.w.sleepAvail < 6).length / n, 0) + '%' : '–', 'podem dormir menos de 6 h por noite'],
-    [n ? fmt(100 * rows.filter(r => r.w.sleepAvail < 4).length / n, 0) + '%' : '–', 'podem dormir menos de 4 h por noite'],
+    [n ? fmt(100 * rows.filter(r => r.w.sleepWorst < 6).length / n, 0) + '%' : '–', 'podem dormir menos de 6 h no dia mais pesado'],
+    [n ? fmt(100 * rows.filter(r => r.w.sleepWorst < 4).length / n, 0) + '%' : '–', 'podem dormir menos de 4 h no dia mais pesado'],
     [n ? fmt(avg(rows.map(r => r.w.sleepWorst))) + ' h' : '–', 'sono possível no dia mais pesado (média)'],
     [n ? fmt(avg(rows.map(r => r.e.classWeekMin / 60))) + ' h' : '–', 'horas de aula por semana (média)'],
     [n ? fmt(avg(rows.map(r => r.e.classMaxDayMin / 60))) + ' h' : '–', 'maior dia de aula (média)'],
