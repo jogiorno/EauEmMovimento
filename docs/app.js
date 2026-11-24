@@ -20,6 +20,8 @@ const redShade = seed => {
   const hue = (354 + (h % 14)) % 360, light = 40 + ((h >> 5) % 16), sat = 100;
   return `hsl(${hue},${sat}%,${light}%)`;
 };
+// Espessura da linha cresce com o tempo de deslocamento diário (ida + volta): 0,8 px (rápido) até 2,4 px (4 h ou mais).
+const lineW = min => min == null ? 1.2 : +(0.8 + 1.6 * Math.min(min, 240) / 240).toFixed(2);
 L.circleMarker([UFF.lat, UFF.lng], { radius: 9, stroke: false, fillColor: '#e60023', fillOpacity: 1 })
   .bindTooltip(UFF.name, { permanent: false }).addTo(map);
 
@@ -35,7 +37,7 @@ for (let i = 1; i <= 10; i++) f.semester.add(new Option(i + 'º período', i));
 DB.list().then(es => {
   $('#n').textContent = es.length;
   for (const e of es)
-    L.polyline([e.home, [UFF.lat, UFF.lng]], { color: redShade(e.id), weight: 2.4, opacity: 0.85, interactive: false }).addTo(lines);
+    L.polyline([e.home, [UFF.lat, UFF.lng]], { color: redShade(e.id), weight: lineW(e.commuteMin), opacity: 0.85, interactive: false }).addTo(lines);
 }).catch(e => msg(e.message));
 
 let home = null, marker = null;
@@ -114,7 +116,7 @@ f.onsubmit = async ev => {
   try {
     await DB.add(body);
     try { localStorage.setItem(KEY, JSON.stringify({ body, at: Date.now() })); } catch {}
-    L.polyline([H, U], { color: redShade(Math.random()), weight: 4, opacity: 1, interactive: false }).addTo(lines);
+    L.polyline([H, U], { color: redShade(Math.random()), weight: lineW(body.commuteMin), opacity: 0.85, interactive: false }).addTo(lines);
     $('#n').textContent = +$('#n').textContent + 1;
     const A = Object.assign({}, Model.DEFAULTS); try { Object.assign(A, JSON.parse(localStorage.getItem('eau-assump-v4') || '{}')); } catch {}
     const w = Model.week(body, A), hm = Model.hm;
