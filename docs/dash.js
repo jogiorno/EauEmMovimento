@@ -1,4 +1,4 @@
-const { DEFAULTS, week, complete, validate, delivery, REFS, refStudy, CATS, ALERT, MIN_N, composition, mean, median, quantile, regress, hm, fmt } = Model;
+const { DEFAULTS, week, complete, validate, trimOutliers, delivery, REFS, refStudy, CATS, ALERT, MIN_N, composition, mean, median, quantile, regress, hm, fmt } = Model;
 const $ = s => document.querySelector(s);
 const A = JSON.parse(JSON.stringify(DEFAULTS));
 try { Object.assign(A, JSON.parse(localStorage.getItem('eau-assump-v4') || '{}')); } catch {}
@@ -36,7 +36,7 @@ const GREEN = '#7a9a8a', GRAY = '#8d98a8', TERRA = '#c0653f', BLUE = '#5b7a99', 
 const ramp = t => { const a = [199, 212, 224], b = [31, 58, 86], f = (t - 1) / 9; return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * f).toString(16).padStart(2, '0')).join(''); };
 
 function render() {
-  const full = entries.filter(complete), good = full.filter(e => !validate(e));
+  const full = entries.filter(complete), valid = full.filter(e => !validate(e)), good = trimOutliers(valid);
   discarded = full.length - good.length;
   const rows = good.map(e => ({ e, w: week(e, A), hrs: e.commuteMin / 60 }));
   const n = rows.length;
@@ -193,7 +193,7 @@ function graph5(rows) {
 // ---------- rodapé metodológico ----------
 function method(rows) {
   $('#mUpd').textContent = new Date().toLocaleString('pt-BR', { dateStyle: 'long', timeStyle: 'short' });
-  $('#mN').textContent = `${rows.length} respostas válidas (de ${entries.length} registros${discarded ? `; ${discarded} ignorada${discarded > 1 ? 's' : ''} por dados incoerentes` : ''})`;
+  $('#mN').textContent = `${rows.length} respostas válidas (de ${entries.length} registros${discarded ? `; ${discarded} ignorada${discarded > 1 ? 's' : ''} por dados incoerentes ou extremos` : ''})`;
 }
 
 function buildAssump() {
