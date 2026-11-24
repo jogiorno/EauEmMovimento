@@ -21,8 +21,11 @@ const redShade = seed => {
 };
 // Espessura da linha cresce com o tempo de deslocamento diário (ida + volta): 0,8 px (rápido) até 2,4 px (4 h ou mais).
 const lineW = min => min == null ? 1.2 : +(0.8 + 1.6 * Math.min(min, 240) / 240).toFixed(2);
-L.circleMarker([UFF.lat, UFF.lng], { radius: 9, stroke: false, fillColor: '#e60023', fillOpacity: 1 })
+const eauDot = L.circleMarker([UFF.lat, UFF.lng], { radius: 9, stroke: false, fillColor: '#e60023', fillOpacity: 1 })
   .bindTooltip(UFF.name, { permanent: false }).addTo(map);
+// O raio do ponto da escola acompanha o zoom: 2 px com o mapa muito afastado, 9 px a partir do zoom 12 (não cobre mais a cidade).
+const eauR = () => Math.max(2, Math.min(9, (map.getZoom() - 7) * 1.5));
+eauDot.setRadius(eauR()); map.on('zoomend', () => eauDot.setRadius(eauR()));
 
 $('#toggle').onclick = () => $('#panel').classList.toggle('collapsed');
 const msg = t => $('#msg').textContent = t || '';
