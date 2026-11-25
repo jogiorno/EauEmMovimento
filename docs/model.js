@@ -138,5 +138,5 @@ window.Model = (() => {
     return (Number.isFinite(h) && h < 0 && m ? '−' : '') + (a ? a + ' h' + (b ? ' ' + b + ' min' : '') : b + ' min'); }; // 5.2 → "5 h 12 min"
   const fmt = (n, d = 1) => n.toLocaleString('pt-BR', { maximumFractionDigits: d });
 
-  return { UFF, DEFAULTS, FIELDS, LIMITS, REFS, refStudy, validate, trimOutliers, delivery, ALERT, GROUPS, CATS, MIN_N, straightKm, complete, week, composition, mean, median, quantile, regress, hm, fmt };
+  return { UFF, BBOX, DEFAULTS, FIELDS, LIMITS, REFS, refStudy, validate, trimOutliers, delivery, ALERT, GROUPS, CATS, MIN_N, straightKm, complete, week, composition, mean, median, quantile, regress, hm, fmt };
 })();

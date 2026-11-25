@@ -6,7 +6,7 @@
 <style>
 html,body{min-height:100%}body{display:flex;flex-direction:column;min-height:100vh}
 main{flex:1;width:100%;max-width:760px;margin:0 auto;padding:48px 24px 80px}
-.logo{position:relative;margin:0 auto 88px;width:min(380px,80%)}.logo img,.logo canvas{display:block;width:100%;height:auto}.logo canvas{position:absolute;inset:0;height:100%}
+.logo{position:relative;margin:0 auto 88px;width:min(380px,80%)}.logo img,.logo canvas{display:block;width:100%;height:auto}.logo canvas{position:absolute;inset:0;height:100%}.logo.click{cursor:pointer;-webkit-tap-highlight-color:transparent}.logo.click:focus-visible{outline:2px solid var(--acc);outline-offset:8px}
 h1{margin:0 0 28px;font-size:34px;line-height:1.2;text-align:left}
 main p{color:var(--mute);font-size:15px;line-height:1.9;margin:0 0 20px}
 main p strong{color:var(--fg)}
@@ -34,21 +34,38 @@ main p strong{color:var(--fg)}
 // O logo é o texto (imagem) + as linhas dos trajetos, desenhadas ao vivo com os dados do banco.
 // Calibração (coordenadas da prancheta original de 4500 px): origem = EAU; S = escala em relação à projeção Web Mercator z12; K = espessura por unidade.
 (() => {
-  const { UFF, BBOX, LIMITS, straightKm } = Model, O = [1536, 2396.3], S = 1.1143, K = 5.3, CV = document.getElementById('lc'), cx = CV.getContext('2d'), f = CV.width / 4500;
+  const { UFF, BBOX, LIMITS, straightKm } = Model, O = [1536, 2396.3], S = 1.1143, K = 7, CV = document.getElementById('lc'), cx = CV.getContext('2d'), f = CV.width / 4500;
   const merc = ([lat, lng]) => { const n = 256 * 2 ** 12; return [(lng + 180) / 360 * n, (1 - Math.asinh(Math.tan(lat * Math.PI / 180)) / Math.PI) / 2 * n]; };
   const shade = seed => { let h = 0; for (const c of String(seed)) h = (Math.imul(h, 31) + c.charCodeAt(0)) >>> 0;
     return `hsl(${(354 + (h % 14)) % 360},100%,${40 + ((h >> 5) % 16)}%)`; };
   const [ux, uy] = merc([UFF.lat, UFF.lng]);
+  let pts = [], busy = false;
+  const draw = n => {
+    cx.clearRect(0, 0, CV.width, CV.height); cx.lineCap = 'butt'; cx.globalAlpha = 0.88;
+    for (const q of pts.slice(0, n)) {
+      cx.strokeStyle = q.c; cx.lineWidth = q.w * K * f;
+      cx.beginPath(); cx.moveTo(O[0] * f, O[1] * f); cx.lineTo((O[0] + q.dx * S) * f, (O[1] + q.dy * S) * f); cx.stroke();
+    }
+  };
+  // Clique no logo: os trajetos entram um a um, na ordem de envio, uma única vez; ao fim volta o logo completo, até o próximo clique.
+  const play = () => {
+    if (busy || !pts.length || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    busy = true; draw(0);
+    const step = Math.min(160, 8000 / pts.length); let n = 0;
+    setTimeout(function tick() { draw(++n); if (n < pts.length) setTimeout(tick, step); else busy = false; }, 600);
+  };
   DB.list().then(es => {
-    cx.lineCap = 'butt';
     for (const e of es) {
       const h = e.home;
       if (!Array.isArray(h) || h[0] < BBOX.latMin || h[0] > BBOX.latMax || h[1] < BBOX.lngMin || h[1] > BBOX.lngMax || straightKm(h, [UFF.lat, UFF.lng]) > LIMITS.maxKm) continue;
-      const [x, y] = merc(h), w = 0.8 + 1.6 * Math.min(e.commuteMin || 0, 240) / 240;
-      cx.strokeStyle = shade(e.id); cx.globalAlpha = 0.88; cx.lineWidth = w * K * f;
-      cx.beginPath(); cx.moveTo(O[0] * f, O[1] * f); cx.lineTo((O[0] + (x - ux) * S) * f, (O[1] + (y - uy) * S) * f); cx.stroke();
+      const [x, y] = merc(h);
+      pts.push({ c: shade(e.id), w: 0.8 + 1.6 * Math.min(e.commuteMin || 0, 240) / 240, dx: x - ux, dy: y - uy });
     }
-  }).catch(() => { document.getElementById('lg').src = 'logo-eau.png'; CV.hidden = true; });
+    draw(pts.length);
+    const box = CV.parentElement; box.classList.add('click'); box.tabIndex = 0; box.setAttribute('role', 'button');
+    box.setAttribute('aria-label', 'Ver os trajetos entrando um a um'); box.title = 'Clique para ver os trajetos entrando um a um';
+    box.onclick = play; box.onkeydown = ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); play(); } };
+  }).catch(err => { console.error(err); document.getElementById('lg').src = 'logo-eau.png'; CV.hidden = true; });
 })();
 </script>
 </body></html>
