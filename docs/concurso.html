@@ -6,7 +6,7 @@
 <style>
 html,body{min-height:100%}body{display:flex;flex-direction:column;min-height:100vh}
 main{flex:1;width:100%;max-width:760px;margin:0 auto;padding:48px 24px 80px}
-.logo{display:block;margin:0 auto 88px;width:min(380px,80%);height:auto}
+.logo{position:relative;margin:0 auto 88px;width:min(380px,80%)}.logo img,.logo canvas{display:block;width:100%;height:auto}.logo canvas{position:absolute;inset:0;height:100%}
 h1{margin:0 0 28px;font-size:34px;line-height:1.2;text-align:left}
 main p{color:var(--mute);font-size:15px;line-height:1.9;margin:0 0 20px}
 main p strong{color:var(--fg)}
@@ -18,7 +18,7 @@ main p strong{color:var(--fg)}
 </style></head><body>
 <nav><img src="logo.png" alt=""><b>EAU EM MOVIMENTO</b><a href="index.html">Mapa</a><a href="dashboard.html">Dados</a><a href="meu-trajeto.html">Meu trajeto</a><span class="sp"></span><small>Arquitetura e Urbanismo · UFF Praia Vermelha</small></nav>
 <main>
-  <img class="logo" src="logo-eau.png" alt="Logo EAU – Escola de Arquitetura e Urbanismo, com as linhas dos trajetos dos estudantes sobre as letras">
+  <div class="logo"><img id="lg" src="logo-eau-texto.png" alt="Logo EAU – Escola de Arquitetura e Urbanismo, com as linhas dos trajetos dos estudantes sobre as letras"><canvas id="lc" width="2000" height="2000" aria-hidden="true"></canvas></div>
   <h1>Um novo logo para a EAU, desenhado por quem a atravessa</h1>
   <p>Há anos, os estudantes desenham a EAU com o próprio corpo. Cada trajeto de casa até a escola, repetido dia após dia, na ida e na volta, deixa uma linha no território. Somadas, essas linhas formam um desenho: um <strong>centro de projeção</strong> que parte da Rua Passo da Pátria e se abre para além da Região Metropolitana do Rio de Janeiro.</p>
   <p>Ninguém deliberadamente pousou o lápis no papel e fez esse desenho, mas ele existe. Ele mostra <strong>quem é a escola de verdade</strong>: de onde vêm as pessoas que a fazem acontecer.</p>
@@ -29,4 +29,26 @@ main p strong{color:var(--fg)}
   <p>Esta é uma <strong>proposta para ser construída em conjunto</strong>. As regras, o prazo, quem pode participar e como será a escolha devem ser definidos de forma democrática, com a participação dos estudantes. Se você quer ajudar a organizar, comece pelo mapa: cada trajeto registrado fortalece o desenho.</p>
   <div class="cta"><a class="btn" href="index.html">Ver o mapa dos trajetos</a></div>
 </main>
+<script src="config.js"></script><script src="db.js"></script><script src="model.js"></script>
+<script>
+// O logo é o texto (imagem) + as linhas dos trajetos, desenhadas ao vivo com os dados do banco.
+// Calibração (coordenadas da prancheta original de 4500 px): origem = EAU; S = escala em relação à projeção Web Mercator z12; K = espessura por unidade.
+(() => {
+  const { UFF, BBOX, LIMITS, straightKm } = Model, O = [1536, 2396.3], S = 1.1143, K = 5.3, CV = document.getElementById('lc'), cx = CV.getContext('2d'), f = CV.width / 4500;
+  const merc = ([lat, lng]) => { const n = 256 * 2 ** 12; return [(lng + 180) / 360 * n, (1 - Math.asinh(Math.tan(lat * Math.PI / 180)) / Math.PI) / 2 * n]; };
+  const shade = seed => { let h = 0; for (const c of String(seed)) h = (Math.imul(h, 31) + c.charCodeAt(0)) >>> 0;
+    return `hsl(${(354 + (h % 14)) % 360},100%,${40 + ((h >> 5) % 16)}%)`; };
+  const [ux, uy] = merc([UFF.lat, UFF.lng]);
+  DB.list().then(es => {
+    cx.lineCap = 'butt';
+    for (const e of es) {
+      const h = e.home;
+      if (!Array.isArray(h) || h[0] < BBOX.latMin || h[0] > BBOX.latMax || h[1] < BBOX.lngMin || h[1] > BBOX.lngMax || straightKm(h, [UFF.lat, UFF.lng]) > LIMITS.maxKm) continue;
+      const [x, y] = merc(h), w = 0.8 + 1.6 * Math.min(e.commuteMin || 0, 240) / 240;
+      cx.strokeStyle = shade(e.id); cx.globalAlpha = 0.88; cx.lineWidth = w * K * f;
+      cx.beginPath(); cx.moveTo(O[0] * f, O[1] * f); cx.lineTo((O[0] + (x - ux) * S) * f, (O[1] + (y - uy) * S) * f); cx.stroke();
+    }
+  }).catch(() => { document.getElementById('lg').src = 'logo-eau.png'; CV.hidden = true; });
+})();
+</script>
 </body></html>
